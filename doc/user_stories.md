@@ -14,8 +14,8 @@ Colleague: User Stories
     I want to view the number of projects in a given time frame
 
 4.  As a freelancer
-    In order to keep track of active projects 
-    I want to mark projects as complete
+    In order to visualize weekly shedule
+    I want to see all projects due in a calendar week view
 
 5.  As a freelancer
     In order to feel accomplished
@@ -37,21 +37,17 @@ Colleague: User Stories
     In order to enjoy using Colleague
     I want to view an attractive interface
 
-9.  As a freelancer
-    In order to visualize weekly shedule
-    I want to see all projects due in a calendar view
-
-10. As a freelancer
+9. As a freelancer
     In order to organize and quickly understand the urgency of my projects
     I want to see color clues indicating how soon a project is due
 
       Acceptance Criteria
 
       1. I want urgent projects(those due today) to turn red
-      2. I want projects that a week or more till they are due to be red
-      3. I want projects that are due between 6 to 1 day from current time to be yellow
+      2. I want projects that a week or more till they are due to be green
+      3. I want projects that are due between 6 to 1 day(s) from current time to be yellow
 
-12. As a freelancer
+10. As a freelancer
     In order to have accurate project list
     I want to easily remove projects
 
@@ -63,6 +59,10 @@ Colleague: User Stories
 
 Extras
 ------
+
+11. As a freelancer
+    In order to visualize and schedule dependant projects
+    I want to implement gantt charts
 
 12. As a freelancer
     In order to manage the details of each project
@@ -84,6 +84,3 @@ Extras
     In order to keep track of my projects to-do list
     I want to add deadlines to any task
 
-17. As a freelancer
-    In order to visualize and schedule dependant projects
-    I want to implement gantt charts
