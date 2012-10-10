@@ -29,6 +29,10 @@ Colleague: User Stories
     In order to organize projects
     I want to list the type of project
 
+    Acceptance Criteria
+
+    1. I want to adds notes helping me to understand the nuances of the project
+
 7.  As a freelancer
     In order to keep track of new clients
     I want to add clients
@@ -37,7 +41,7 @@ Colleague: User Stories
     In order to enjoy using Colleague
     I want to view an attractive interface
 
-9. As a freelancer
+9.  As a freelancer
     In order to organize and quickly understand the urgency of my projects
     I want to see color clues indicating how soon a project is due
 
@@ -60,11 +64,14 @@ Colleague: User Stories
 Extras
 ------
 
-11. As a freelancer
+11. As an advanced freelancer
     In order to visualize and schedule dependant projects
     I want to implement gantt charts
 
-12. As a freelancer
+    1. I want to have dependent projects whose start and end date are determined by the end date of the first project
+    2. I want to be able to change the start / end date of the first project and have the dependent project auto adjust its start / end date
+
+12. As a detail oriented freelancer
     In order to manage the details of each project
     I want to add checklists within projects
 
@@ -84,3 +91,8 @@ Extras
     In order to keep track of my projects to-do list
     I want to add deadlines to any task
 
+17. As a freelancer with many projects
+    In order to manage clients
+    I want to be able to view all projects for a particular client
+
+    1. I want to have a client search field
