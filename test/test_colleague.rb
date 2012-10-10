@@ -3,8 +3,11 @@ require 'colleague'
 require 'project'
 require 'client'
 require 'constants'
+require 'project_file'
+require 'client_manager'
 
 class ColleagueTest < Test::Unit::TestCase
+  include Project_file
 #==============project object attributes================#
   def test_01_project_must_have_title
     project = Project.new("my great project")
@@ -73,6 +76,33 @@ class ColleagueTest < Test::Unit::TestCase
     client = Client.new
     client.phone = "555-5555"
     assert_equal "555-5555", client.phone
+  end
+  def test_12b_client_manager_tallies_num_clients
+    cm = Client_manager.new
+    client1 = Client.new
+    client2 = Client.new
+    client3 = Client.new
+    cm.add_client(client1)
+    cm.add_client(client2)
+    cm.add_client(client3)
+    assert_equal 3, cm.num_clients
+    File.open('lib/clients.csv', 'w') { |file| file.truncate(0) }
+  end
+  def test_12c_client_has_id
+    cm = Client_manager.new
+    client = Client.new
+    cm.add_client(client)
+    assert_equal 1, client.id
+    File.open('lib/clients.csv', 'w') { |file| file.truncate(0) }
+  end
+  def test_12e_client_has_id
+    cm = Client_manager.new
+    client = Client.new
+    client2 = Client.new
+    cm.add_client(client)
+    cm.add_client(client2)
+    assert_equal 2, client2.id
+    File.open('lib/clients.csv', 'w') { |file| file.truncate(0) }
   end
   def test_13_project_can_set_client
     client = Client.new
@@ -160,8 +190,243 @@ class ColleagueTest < Test::Unit::TestCase
     end
     file.close
     assert_equal lines[0].to_s, "1,great title,2012-10-10 22:53:57 -0500,web design,2012-10-09 22:53:57 -0500,notes,incomplete,Jane Doe\n"
-    File.open('lib/projects.csv', 'w') {|file| file.truncate(0) }
+    File.open('lib/projects.csv', 'w') { |file| file.truncate(0) }
+  end 
+
+  def test_25_colleague_adds_project_to_file
+    proj_manager = Colleague.new
+    project = Project.new("great title")
+    project2 = Project.new("another great title")
+    jane_doe = Client.new
+    john_doe = Client.new
+    project.start_time = Time.local(2012, 10, 9, 22, 53,57)
+    project.deadline = Time.local(2012,10,10, 22,53,57)
+    project.notes = "notes"
+    jane_doe.first_name = "Jane"
+    jane_doe.last_name = "Doe"
+    project.type = 'web design'
+    project.client = jane_doe
+    project2.start_time = Time.local(2012, 10, 9, 22, 53,57)
+    project2.deadline = Time.local(2012,10,20, 22,53,57)
+    project2.notes = "remember"
+    john_doe.first_name = "John"
+    john_doe.last_name = "Doe"
+    project2.type = 'web development'
+    project2.client = jane_doe
+    proj_manager.add_project(project)
+    proj_manager.add_project(project2)
+    lines = []
+    file = File.open('lib/projects.csv', 'r')
+    while (line = file.gets) do 
+      lines << line
+    end
+    file.close
+    assert_equal lines.each{ |line| line.to_s }, ["1,great title,2012-10-10 22:53:57 -0500,web design,2012-10-09 22:53:57 -0500,notes,incomplete,Jane Doe\n",
+                                                  "2,another great title,2012-10-20 22:53:57 -0500,web development,2012-10-09 22:53:57 -0500,remember,incomplete,Jane Doe\n"]
+    File.open('lib/projects.csv', 'w') { |file| file.truncate(0) }
+  end 
+
+  def test_26_colleague_adds_project_to_file
+    proj_manager = Colleague.new
+    project = Project.new("great title")
+    project.start_time = Time.local(2012, 10, 9, 22, 53, 57)
+    proj_manager.add_project(project)
+    lines = []
+    file = File.open('lib/projects.csv', 'r')
+    while (line = file.gets) do 
+      lines << line
+    end
+    file.close
+    assert_equal lines.each{ |line| line.to_s }, ["1,great title,,,2012-10-09 22:53:57 -0500,,incomplete,\n"]
+    File.open('lib/projects.csv', 'w') { |file| file.truncate(0) }
+  end  
+
+  def test_27_colleague_sets_project_id_to_match_num_projects
+    proj_manager = Colleague.new
+    project = Project.new("great title")
+    proj_manager.add_project(project)
+    assert_equal 1, project.id
+    File.open('lib/projects.csv', 'w') { |file| file.truncate(0) }
+  end 
+  def test_27b_colleague_sets_project_id_to_match_num_projects
+    proj_manager = Colleague.new
+    project = Project.new("great title")
+    project2 = Project.new("another great title")
+    proj_manager.add_project(project)
+    proj_manager.add_project(project2)
+    assert_equal 2, project2.id
+    File.open('lib/projects.csv', 'w') { |file| file.truncate(0) }
+  end 
+#==============Module tests================#
+  def test_27c_Module_reads_file
+    proj_manager = Colleague.new
+    project = Project.new("great title")
+    project2 = Project.new("another great title")
+    jane_doe = Client.new
+    john_doe = Client.new
+    project.start_time = Time.local(2012, 10, 9, 22, 53,57)
+    project.deadline = Time.local(2012,10,10, 22,53,57)
+    project.notes = "notes"
+    jane_doe.first_name = "Jane"
+    jane_doe.last_name = "Doe"
+    project.type = 'web design'
+    project.client = jane_doe
+    project2.start_time = Time.local(2012, 10, 9, 22, 53,57)
+    project2.deadline = Time.local(2012,10,20, 22,53,57)
+    project2.notes = "remember"
+    john_doe.first_name = "John"
+    john_doe.last_name = "Doe"
+    project2.type = 'web development'
+    project2.client = jane_doe
+    proj_manager.add_project(project)
+    proj_manager.add_project(project2)
+    assert_equal read, [{:id => "1",:title => "great title",:deadline => "2012-10-10 22:53:57 -0500",:type => "web design",:start => "2012-10-09 22:53:57 -0500",:notes => "notes",:status => "incomplete",:client => "Jane Doe\n"},
+                        {:id => '2',:title => "another great title",:deadline => "2012-10-20 22:53:57 -0500",:type => "web development",:start => "2012-10-09 22:53:57 -0500",:notes => "remember",:status => "incomplete",:client => "Jane Doe\n"}]
+    File.open('lib/projects.csv', 'w') { |file| file.truncate(0) }
   end
+  def test_27d_Module_changes_start_time_after_project_added_to_file
+    proj_manager = Colleague.new
+    project = Project.new("great title")
+    project2 = Project.new("another great title")
+    project.start_time = Time.local(2012, 10, 9, 22, 53,57)
+    proj_manager.add_project(project)
+    proj_manager.add_project(project2)
+    project2.start_time = Time.local(2012, 10, 9, 22, 53,57)
+
+    assert_equal read, [{:id => "1",:title => "great title",:deadline => "",:type => "",:start => "2012-10-09 22:53:57 -0500",:notes => "",:status => 'incomplete',:client => "\n"},
+                        {:id => "2",:title => "another great title",:deadline => "",:type => "",:start => "2012-10-09 22:53:57 -0500",:notes => "",:status => "incomplete",:client => "\n"}]
+    File.open('lib/projects.csv', 'w') { |file| file.truncate(0) }
+  end
+
+  def test_27e_Module_changes_start_time_after_project_added_to_file
+    proj_manager = Colleague.new
+    project = Project.new("great title")
+    project2 = Project.new("another great title")
+    project.start_time = Time.local(2012, 10, 9, 22, 53,57)
+    proj_manager.add_project(project)
+    proj_manager.add_project(project2)
+    project2.start_time = Time.local(2012, 10, 9, 22, 53,57)
+
+    assert_equal project2.start_time.to_s, "2012-10-09 22:53:57 -0500"
+    File.open('lib/projects.csv', 'w') { |file| file.truncate(0) }
+  end
+
+  def test_28_can_change_project_attributes_after_added_to_colleague
+    proj_manager = Colleague.new
+    project = Project.new("great title")
+    project.start_time = Time.local(2012, 10, 9, 22, 53, 57)
+    proj_manager.add_project(project)
+    project.deadline = Time.local(2012,10,10, 22,53,57)
+    lines = []
+    file = File.open('lib/projects.csv', 'r')
+    while (line = file.gets) do 
+      lines << line
+    end
+    file.close
+    assert_equal lines.each{ |line| line.to_s }, ["1,great title,2012-10-10 22:53:57 -0500,,2012-10-09 22:53:57 -0500,,incomplete,\n"]
+    File.open('lib/projects.csv', 'w') { |file| file.truncate(0) }
+  end
+
+  def test_29_can_change_project_attributes_after_added_to_colleague
+    proj_manager = Colleague.new
+    project = Project.new("great title")
+    project.start_time = Time.local(2012, 10, 9, 22, 53, 57)
+    proj_manager.add_project(project)
+    project.deadline = Time.local(2012,10,10, 22,53,57)
+    project.notes = "notes"
+    project.type = 'web design'
+    project.status = :complete
+    project.title = "new title"
+    lines = []
+    file = File.open('lib/projects.csv', 'r')
+    while (line = file.gets) do 
+      lines << line
+    end
+    file.close
+    assert_equal lines.each{ |line| line.to_s }, ["1,new title,2012-10-10 22:53:57 -0500,web design,2012-10-09 22:53:57 -0500,notes,complete,\n"]
+    File.open('lib/projects.csv', 'w') { |file| file.truncate(0) }
+  end
+
+  def test_30_can_change_project_title_after_added_to_colleague
+    proj_manager = Colleague.new
+    project = Project.new("great title")
+    proj_manager.add_project(project)
+    project.title = "new title"
+    assert_equal "new title", project.title
+    File.open('lib/projects.csv', 'w') { |file| file.truncate(0) }
+  end
+
+  def test_31_can_change_project_status_after_added_to_colleague
+    proj_manager = Colleague.new
+    project = Project.new("great title")
+    proj_manager.add_project(project)
+    project.status = :complete
+    assert_equal :complete, project.status
+    File.open('lib/projects.csv', 'w') { |file| file.truncate(0) }
+  end
+
+  def test_32_can_change_project_type_after_added_to_colleague
+    proj_manager = Colleague.new
+    project = Project.new("great title")
+    proj_manager.add_project(project)
+    project.type = "web development"
+    assert_equal "web development", project.type
+    File.open('lib/projects.csv', 'w') { |file| file.truncate(0) }
+  end
+
+  def test_33_can_change_project_notes_after_added_to_colleague
+    proj_manager = Colleague.new
+    project = Project.new("great title")
+    proj_manager.add_project(project)
+    project.notes = "important"
+    assert_equal "important", project.notes
+    File.open('lib/projects.csv', 'w') { |file| file.truncate(0) }
+  end
+
+  def test_34_can_change_project_client_after_added_to_colleague
+    proj_manager = Colleague.new
+    project = Project.new("great title")
+    project.start_time = Time.local(2012, 10, 9, 22, 53, 57)
+    proj_manager.add_project(project)
+    client2 = Client.new
+    client2.first_name = "Glen"
+    client2.last_name = "Stevens"
+    project.client = client2
+    lines = []
+    file = File.open('lib/projects.csv', 'r')
+    while (line = file.gets) do 
+      lines << line
+    end
+    file.close
+    assert_equal lines.each{ |line| line.to_s }, ["1,great title,,,2012-10-09 22:53:57 -0500,,incomplete,Glen Stevens\n"]
+    File.open('lib/projects.csv', 'w') { |file| file.truncate(0) }
+  end
+
+  def test_35_can_change_project_client_after_added_to_colleague
+    proj_manager = Colleague.new
+    project = Project.new("great title")
+    proj_manager.add_project(project)
+    client2 = Client.new
+    client2.first_name = "Glen"
+    client2.last_name = "Stevens"
+    project.client = client2
+    assert_equal "Glen Stevens", project.client
+    File.open('lib/projects.csv', 'w') { |file| file.truncate(0) }
+  end
+
+  def test_36_can_change_project_client_name_after_added_to_colleague
+    proj_manager = Colleague.new
+    project = Project.new("great title")
+    proj_manager.add_project(project)
+    client2 = Client.new
+    client2.first_name = "Glen"
+    client2.last_name = "Stevens"
+    project.client = client2
+    client2.first_name = "Sam"
+    assert_equal "Sam Stevens", project.client
+    File.open('lib/projects.csv', 'w') { |file| file.truncate(0) }
+  end
+
 end
 
 

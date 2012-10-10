@@ -1,9 +1,10 @@
 require 'client'
 require 'constants'
+require 'project_file'
 
 class Project
-
-  attr_reader :title, :status, :type, :notes, :start_time, :deadline, :client
+  include Project_file
+  attr_reader :title, :status, :type, :notes, :start_time, :deadline, :client, :id
 
   def initialize title
     @title = title
@@ -12,27 +13,27 @@ class Project
   end
 
   def type= type
-    @type = type
+    !id ? @type = type : @type = update(@id, :type, type)
   end
 
   def notes= notes
-    @notes = notes
+    !id ? @notes = notes : @notes = update(@id, :notes, notes)
   end
 
   def start_time= time
-    @start_time = time
+    !id ? @start_time = time : @start_time = update(@id, :start, time)
   end
 
   def deadline= time
-    @deadline = time
+    !id ? @deadline = time : @deadline = update(@id, :deadline, time)
   end
 
   def client= client
-    @client = "#{client.first_name} #{client.last_name}"
+    !id ? @client = "#{client.first_name} #{client.last_name}" : @client = update(@id, :client, "#{client.first_name} #{client.last_name}" )
   end
 
   def status= status
-    @status = status
+    !id ? @status = status : @status = update(@id, :status, status)
   end
 
   def time_till_due
@@ -49,6 +50,14 @@ class Project
 
   def is_due_later?
     time_till_due > (3 * DAY) ? true : false
+  end
+
+  def id= project_number
+    @id = project_number
+  end
+
+  def title= new_title
+    !id ? @title = new_title : @title = update(@id, :title, new_title)
   end
 
 end

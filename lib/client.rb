@@ -1,5 +1,5 @@
 class Client
-  attr_reader :first_name, :last_name, :email, :phone
+  attr_reader :first_name, :last_name, :email, :phone, :id
 
   def first_name= name 
     @first_name = name
@@ -17,4 +17,8 @@ class Client
     @phone = phone
   end
 
+  def id= id
+    @id = id
+  end
+  
 end
