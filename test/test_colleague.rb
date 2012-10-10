@@ -138,5 +138,46 @@ class ColleagueTest < Test::Unit::TestCase
     proj_manager.add_project(project)
     proj_manager.add_project(project2)
     assert_equal 2, proj_manager.num_projects
+    File.open('lib/projects.csv', 'w') {|file| file.truncate(0) }
+  end
+
+  def test_24_colleague_adds_project_to_file
+    proj_manager = Colleague.new
+    project = Project.new("great title")
+    jane_doe = Client.new
+    project.start_time = Time.local(2012, 10, 9, 22, 53,57)
+    project.deadline = Time.local(2012,10,10, 22,53,57)
+    project.notes = "notes"
+    jane_doe.first_name = "Jane"
+    jane_doe.last_name = "Doe"
+    project.type = 'web design'
+    project.client = jane_doe
+    proj_manager.add_project(project)
+    lines = []
+    file = File.open('lib/projects.csv', 'r')
+    while (line = file.gets) do 
+      lines << line
+    end
+    file.close
+    assert_equal lines[0].to_s, "1,great title,2012-10-10 22:53:57 -0500,web design,2012-10-09 22:53:57 -0500,notes,incomplete,Jane Doe\n"
+    File.open('lib/projects.csv', 'w') {|file| file.truncate(0) }
   end
 end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
