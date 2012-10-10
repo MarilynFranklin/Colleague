@@ -120,4 +120,23 @@ class ColleagueTest < Test::Unit::TestCase
     project.deadline= Time.now + (3.5 * DAY)
     assert_equal true, project.is_due_later?
   end
+#==============colleague object tests================#
+  def test_21_colleague_is_object
+    proj_manager = Colleague.new
+    assert_equal Colleague, proj_manager.class
+  end
+  
+  def test_22_colleague_keeps_track_of_num_projects_ever_created
+    proj_manager = Colleague.new
+    assert_equal 0, proj_manager.num_projects
+  end
+
+  def test_23_colleague_keeps_track_of_num_projects_ever_created
+    proj_manager = Colleague.new
+    project = Project.new("first")
+    project2 = Project.new("second")
+    proj_manager.add_project(project)
+    proj_manager.add_project(project2)
+    assert_equal 2, proj_manager.num_projects
+  end
 end
