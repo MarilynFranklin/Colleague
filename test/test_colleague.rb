@@ -108,16 +108,23 @@ class ColleagueTest < Test::Unit::TestCase
     client = Client.new
     client.first_name = "Jane"
     client.last_name = "Smith"
+    cm = Client_manager.new
+    cm.add_client(client)
     project = Project.new("title")
     project.client= client
-    assert_equal "Jane Smith", project.client
+    assert_equal 1, project.client.id
+    File.open('lib/clients.csv', 'w') { |file| file.truncate(0) }
   end
   def test_14_project_can_set_client
     client = Client.new
-    client.first_name = "Jane"
+    client2 = Client.new
+    cm = Client_manager.new
+    cm.add_client(client)
+    cm.add_client(client2)
     project = Project.new("title")
-    project.client= client
-    assert_equal "Jane ", project.client
+    project.client= client2
+    assert_equal 2, project.client.id
+    File.open('lib/clients.csv', 'w') { |file| file.truncate(0) }
   end
 #==============project object operations================#
   def test_15_can_set_project_as_complete
@@ -189,7 +196,7 @@ class ColleagueTest < Test::Unit::TestCase
       lines << line
     end
     file.close
-    assert_equal lines[0].to_s, "1,great title,2012-10-10 22:53:57 -0500,web design,2012-10-09 22:53:57 -0500,notes,incomplete,Jane Doe\n"
+    assert_equal lines[0].to_s, "1,great title,2012-10-10 22:53:57 -0500,web design,2012-10-09 22:53:57 -0500,notes,incomplete,\n"
     File.open('lib/projects.csv', 'w') { |file| file.truncate(0) }
   end 
 
@@ -221,8 +228,8 @@ class ColleagueTest < Test::Unit::TestCase
       lines << line
     end
     file.close
-    assert_equal lines.each{ |line| line.to_s }, ["1,great title,2012-10-10 22:53:57 -0500,web design,2012-10-09 22:53:57 -0500,notes,incomplete,Jane Doe\n",
-                                                  "2,another great title,2012-10-20 22:53:57 -0500,web development,2012-10-09 22:53:57 -0500,remember,incomplete,Jane Doe\n"]
+    assert_equal lines.each{ |line| line.to_s }, ["1,great title,2012-10-10 22:53:57 -0500,web design,2012-10-09 22:53:57 -0500,notes,incomplete,\n",
+                                                  "2,another great title,2012-10-20 22:53:57 -0500,web development,2012-10-09 22:53:57 -0500,remember,incomplete,\n"]
     File.open('lib/projects.csv', 'w') { |file| file.truncate(0) }
   end 
 
@@ -280,8 +287,8 @@ class ColleagueTest < Test::Unit::TestCase
     project2.client = jane_doe
     proj_manager.add_project(project)
     proj_manager.add_project(project2)
-    assert_equal read, [{:id => "1",:title => "great title",:deadline => "2012-10-10 22:53:57 -0500",:type => "web design",:start => "2012-10-09 22:53:57 -0500",:notes => "notes",:status => "incomplete",:client => "Jane Doe\n"},
-                        {:id => '2',:title => "another great title",:deadline => "2012-10-20 22:53:57 -0500",:type => "web development",:start => "2012-10-09 22:53:57 -0500",:notes => "remember",:status => "incomplete",:client => "Jane Doe\n"}]
+    assert_equal read, [{:id => "1",:title => "great title",:deadline => "2012-10-10 22:53:57 -0500",:type => "web design",:start => "2012-10-09 22:53:57 -0500",:notes => "notes",:status => "incomplete",:client => "\n"},
+                        {:id => '2',:title => "another great title",:deadline => "2012-10-20 22:53:57 -0500",:type => "web development",:start => "2012-10-09 22:53:57 -0500",:notes => "remember",:status => "incomplete",:client => "\n"}]
     File.open('lib/projects.csv', 'w') { |file| file.truncate(0) }
   end
   def test_27d_Module_changes_start_time_after_project_added_to_file
@@ -398,7 +405,7 @@ class ColleagueTest < Test::Unit::TestCase
       lines << line
     end
     file.close
-    assert_equal lines.each{ |line| line.to_s }, ["1,great title,,,2012-10-09 22:53:57 -0500,,incomplete,Glen Stevens\n"]
+    assert_equal lines.each{ |line| line.to_s }, ["1,great title,,,2012-10-09 22:53:57 -0500,,incomplete,\n"]
     File.open('lib/projects.csv', 'w') { |file| file.truncate(0) }
   end
 
@@ -410,7 +417,7 @@ class ColleagueTest < Test::Unit::TestCase
     client2.first_name = "Glen"
     client2.last_name = "Stevens"
     project.client = client2
-    assert_equal "Glen Stevens", project.client
+    assert_equal "Glen", project.client.first_name
     File.open('lib/projects.csv', 'w') { |file| file.truncate(0) }
   end
 
@@ -423,7 +430,7 @@ class ColleagueTest < Test::Unit::TestCase
     client2.last_name = "Stevens"
     project.client = client2
     client2.first_name = "Sam"
-    assert_equal "Sam Stevens", project.client
+    assert_equal "Sam", project.client.first_name
     File.open('lib/projects.csv', 'w') { |file| file.truncate(0) }
   end
 

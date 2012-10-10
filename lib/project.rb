@@ -29,7 +29,7 @@ class Project
   end
 
   def client= client
-    !id ? @client = "#{client.first_name} #{client.last_name}" : @client = update(@id, :client, "#{client.first_name} #{client.last_name}" )
+    !id ? @client = client : @client = update(@id, :client, client )
   end
 
   def status= status

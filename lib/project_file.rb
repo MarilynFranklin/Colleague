@@ -14,7 +14,7 @@ module Project_file
   def update(id, key, value)
     projects = read
     project_index = id - 1
-    projects[project_index][key] = value
+    projects[project_index][key] = key == :client ? value.id : value
     lines = File.readlines('lib/projects.csv')
     lines[project_index] = projects[project_index].values.join(",")
     File.open('lib/projects.csv', 'w') do |csv|
