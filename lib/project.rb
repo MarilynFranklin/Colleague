@@ -1,13 +1,15 @@
-require 'client'
-require 'constants'
-require 'project_file'
+require_relative 'client'
+require_relative 'constants'
+require_relative 'project_file'
 
 class Project
   include Project_file
   attr_reader :title, :status, :type, :notes, :start_time, :deadline, :client, :id
 
-  def initialize title
-    @title = title
+  def initialize *title
+    if title.size == 1 
+      @title = title
+    end
     @status = :incomplete
     @start_time = Time.now
   end

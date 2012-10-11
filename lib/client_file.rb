@@ -1,6 +1,6 @@
 module Client_file
 
-  def read
+  def read_clients
     file = File.open('lib/clients.csv', 'r')
     clients = []
     while (line = file.gets)
@@ -11,12 +11,12 @@ module Client_file
     clients
   end
 
-  def update(id, key, value)
-    projects = read
-    project_index = id - 1
-    projects[project_index][key] = value
+  def update_clients(id, key, value)
+    clients = read_clients
+    client_index = id - 1
+    clients[client_index][key] = value
     lines = File.readlines('lib/clients.csv')
-    lines[project_index] = projects[project_index].values.join(",")
+    lines[project_index] = clients[client_index].values.join(",")
     File.open('lib/clients.csv', 'w') do |csv|
       lines.each{ |line| csv.puts(line) }
     end
