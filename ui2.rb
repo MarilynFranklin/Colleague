@@ -82,35 +82,60 @@ Shoes.app :title => 'Colleague', :width => 1000 do
               edit.hide()
             end
 
+            def edit_time_flow(project_object, caption, getter, setter)
+              edit = flow 
+              slot = stack(:width => 200)do
+                if project_object.send( getter ).to_i == 0
+                  para "#{caption}:"
+                else                  
+                  para "#{caption}: #{project_object.send(getter).to_date}" 
+                  # para "#{project_object.send( getter ).to_date}"
+                end
+              end
+              button = stack(:width => 1) do
+                button 'edit' do
+                  edit.show()
+                  button.hide()
+                end
+              end
+              edit = flow(:width => 500) do
+                  month_edit = edit_line(:width => 30)
+                  para "/ " 
+                  day_edit = edit_line(:width => 30)
+                  para "/ " 
+                  year_edit = edit_line(:width => 50)
+                  para "( MM/DD/YYYY )" 
+                button 'Add' do
+                  project_object.send setter, Time.local(year_edit.text.to_i, month_edit.text.to_i, day_edit.text.to_i)
+                  slot.clear{ para "#{caption}: #{project_object.send(getter).to_date}" }
+                  edit.hide()
+                  button.show()
+                  @main_app.send(@refresh_history)
+                end
+              end
+              edit.hide()
+
+            end
+
 
             flow do
               edit_project_flow(project, 'Title', :title, :title=)
             end
 
             flow do
-              @start_slot = stack(:width => 200){ para "start: #{Time.at(project.start_time).to_date}" }
-              @button_start = stack(:width => 25){button "edit" do
-              @start_edit.show() 
-              @button_start.hide()
-              end }
-              @start_edit = flow(:width => 500) {
-                  month_edit = edit_line(:width => 25)
-                  para "/ " 
-                  day_edit = edit_line(:width => 25)
-                  para "/ " 
-                  year_edit = edit_line(:width => 50)
-                  para "( MM/DD/YYYY )" 
-                  button 'Add' do
-                    @start_slot.clear{ para "start: #{Time.at(project.start_time).to_date}" }
-                    @start_edit.hide()
-                    @button_start.show()
-                  end
-              }
-              @start_edit.hide()
+              edit_time_flow(project, 'Start', :start_time, :start_time=)
+            end
+
+            flow do
+              edit_time_flow(project, 'Deadline', :deadline, :deadline=)
             end
 
             flow do  
               edit_project_flow(project, 'Notes', :notes, :notes=)
+            end
+
+            flow do  
+              edit_project_flow(project, 'Project Type', :type, :type=)
             end
           end
         end
