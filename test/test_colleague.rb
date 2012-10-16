@@ -444,41 +444,53 @@ class ColleagueTest < Test::Unit::TestCase
     File.open('lib/projects.csv', 'w') { |file| file.truncate(0) }
   end  
 
-  def test_37_set_up_next_test
-    project = Project.new
-    project2 = Project.new
-    project2.title = "new title"
-    c = Colleague.new
-    c.add_project(project)
-    c.add_project(project2)
-  end
+  # def test_37_set_up_next_test
+  #   project = Project.new
+  #   project2 = Project.new
+  #   project2.title = "new title"
+  #   c = Colleague.new
+  #   c.add_project(project)
+  #   c.add_project(project2)
+  # end
 
-  def test_38
-    colleague = Colleague.new
-    client_manager = Client_manager.new
-    setup = Setup.new(colleague, client_manager)
-    clients = setup.client_history
-    projects = setup.project_history
-    assert_equal 2, projects[1][:id].to_i
-  end
-  def test_38c
-    colleague = Colleague.new
-    client_manager = Client_manager.new
-    setup = Setup.new(colleague, client_manager)
-    clients = setup.client_history
-    projects = setup.project_history
-    assert_equal 2, colleague.projects.size
-  end
+  # def test_38
+  #   colleague = Colleague.new
+  #   client_manager = Client_manager.new
+  #   setup = Setup.new(colleague, client_manager)
+  #   clients = setup.client_history
+  #   projects = setup.project_history
+  #   assert_equal 2, projects[1][:id].to_i
+  # end
+  # def test_38c
+  #   colleague = Colleague.new
+  #   client_manager = Client_manager.new
+  #   setup = Setup.new(colleague, client_manager)
+  #   clients = setup.client_history
+  #   projects = setup.project_history
+  #   assert_equal 2, colleague.projects.size
+  # end
 
-  def test_38d
-    colleague = Colleague.new
-    client_manager = Client_manager.new
-    setup = Setup.new(colleague, client_manager)
-    clients = setup.client_history
-    projects = setup.project_history
-    project = setup.colleague.project(projects[1][:id].to_i)
-    assert_equal "new title", project.title
-  end
+  # def test_38d
+  #   colleague = Colleague.new
+  #   client_manager = Client_manager.new
+  #   setup = Setup.new(colleague, client_manager)
+  #   clients = setup.client_history
+  #   projects = setup.project_history
+  #   project = setup.colleague.project(projects[1][:id].to_i)
+  #   assert_equal "new title", project.title
+  # end
+
+  # def test_39_can_set_client_to_nil
+  #   project = Project.new
+  #   client = Client.new
+  #   colleague = Colleague.new
+  #   cm = Client_manager.new
+  #   colleague.add_project(project)
+  #   cm.add_client(client)
+  #   project.client = client
+  #   project.client = nil
+  #   assert_equal nil, project.client
+  # end
 
 end
 
