@@ -29,8 +29,4 @@ module Project_file
     value
   end 
 
-  def populate_project_history
-
-  end
-
 end
