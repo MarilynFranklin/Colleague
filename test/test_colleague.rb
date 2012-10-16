@@ -5,49 +5,50 @@ require 'client'
 require 'constants'
 require 'project_file'
 require 'client_manager'
+require 'setup'
 
 class ColleagueTest < Test::Unit::TestCase
   include Project_file
 #==============project object attributes================#
   def test_01_project_must_have_title
-    project = Project.new("my great project")
+    project = Project.new
     assert_equal "my great project", project.title
   end
   def test_02_project_exists
-    project = Project.new("great title")
+    project = Project.new
     assert_equal Project, project.class
   end
   def test_03_project_default_status_is_incomplete
-    project = Project.new("great title")
+    project = Project.new
     assert_equal :incomplete, project.status
   end
   def test_04_can_set_project_type
-    project = Project.new("great title")
+    project = Project.new
     project.type = "web design"
     assert_equal "web design", project.type
   end
   def test_04b_can_set_project_type
-    project = Project.new("great title")
+    project = Project.new
     project.type = "logo"
     assert_equal "logo", project.type
   end
   def test_05_can_add_project_notes
-    project = Project.new("great title")
+    project = Project.new
     project.notes = "remember this!"
     assert_equal "remember this!", project.notes
   end
   def test_06_projects_should_set_start_time_automatically
-    project = Project.new("great title")
+    project = Project.new
     assert_equal Time.now.hour, project.start_time.hour
   end
   def test_06b_user_can_change_start_time
-    project = Project.new("great title")
+    project = Project.new
     time = Time.local(2012, 3, 2)
     project.start_time = time
     assert_equal time, project.start_time
   end
   def test_07_can_set_project_deadline
-    project = Project.new("great title")
+    project = Project.new
     time = Time.local(2012, 3, 2, 16, 45, 02)
     project.deadline = time
     assert_equal time, project.deadline
@@ -110,7 +111,7 @@ class ColleagueTest < Test::Unit::TestCase
     client.last_name = "Smith"
     cm = Client_manager.new
     cm.add_client(client)
-    project = Project.new("title")
+    project = Project.new
     project.client= client
     assert_equal 1, project.client.id
     File.open('lib/clients.csv', 'w') { |file| file.truncate(0) }
@@ -121,7 +122,7 @@ class ColleagueTest < Test::Unit::TestCase
     cm = Client_manager.new
     cm.add_client(client)
     cm.add_client(client2)
-    project = Project.new("title")
+    project = Project.new
     project.client= client2
     assert_equal 2, project.client.id
     File.open('lib/clients.csv', 'w') { |file| file.truncate(0) }
@@ -132,39 +133,39 @@ class ColleagueTest < Test::Unit::TestCase
     cm = Client_manager.new
     cm.add_client(client)
     cm.add_client(client2)
-    project = Project.new("title")
+    project = Project.new
     project.client= client2
     assert_equal client2, cm.client(2)
     File.open('lib/clients.csv', 'w') { |file| file.truncate(0) }
   end
 #==============project object operations================#
   def test_15_can_set_project_as_complete
-    project = Project.new("title")
+    project = Project.new
     project.status= :complete
     assert_equal :complete, project.status
   end
   def test_16_time_till_due_is_correct
-    project = Project.new("title")
+    project = Project.new
     project.deadline= Time.now + (3 * DAY)
     assert_equal true, project.time_till_due <= (3 * DAY) && project.time_till_due > (2 * DAY)
   end
   def test_17_time_till_due_is_correct
-    project = Project.new("title")
+    project = Project.new
     project.deadline= Time.now + (4 * DAY)
     assert_equal false, project.time_till_due == (3 * DAY)
   end
   def test_18_is_urgent_returns_true_if_one_day_from_now
-    project = Project.new("title")
+    project = Project.new
     project.deadline= Time.now + DAY
     assert_equal true, project.is_urgent?
   end
   def test_19_is_due_soon_returns_true_if_due_between_3_and_1_day
-    project = Project.new("title")
+    project = Project.new
     project.deadline= Time.now + (2 * DAY)
     assert_equal true, project.is_due_soon?
   end
   def test_20_is_due_later_returns_true_when_greater_than_3_days_away
-    project = Project.new("title")
+    project = Project.new
     project.deadline= Time.now + (3.5 * DAY)
     assert_equal true, project.is_due_later?
   end
@@ -181,8 +182,8 @@ class ColleagueTest < Test::Unit::TestCase
 
   def test_23_colleague_keeps_track_of_num_projects_ever_created
     proj_manager = Colleague.new
-    project = Project.new("first")
-    project2 = Project.new("second")
+    project = Project.new
+    project2 = Project.new
     proj_manager.add_project(project)
     proj_manager.add_project(project2)
     assert_equal 2, proj_manager.num_projects
@@ -261,15 +262,15 @@ class ColleagueTest < Test::Unit::TestCase
 
   def test_27_colleague_sets_project_id_to_match_num_projects
     proj_manager = Colleague.new
-    project = Project.new("great title")
+    project = Project.new
     proj_manager.add_project(project)
     assert_equal 1, project.id
     File.open('lib/projects.csv', 'w') { |file| file.truncate(0) }
   end 
   def test_27b_colleague_sets_project_id_to_match_num_projects
     proj_manager = Colleague.new
-    project = Project.new("great title")
-    project2 = Project.new("another great title")
+    project = Project.new
+    project2 = Project.new
     proj_manager.add_project(project)
     proj_manager.add_project(project2)
     assert_equal 2, project2.id
@@ -278,8 +279,8 @@ class ColleagueTest < Test::Unit::TestCase
 #==============Module tests================#
   # def test_27c_Module_reads_file
   #   proj_manager = Colleague.new
-  #   project = Project.new("great title")
-  #   project2 = Project.new("another great title")
+  #   project = Project.new
+  #   project2 = Project.new
   #   jane_doe = Client.new
   #   john_doe = Client.new
   #   project.start_time = Time.local(2012, 10, 9, 22, 53,57)
@@ -304,8 +305,8 @@ class ColleagueTest < Test::Unit::TestCase
   # end
   # def test_27d_Module_changes_start_time_after_project_added_to_file
   #   proj_manager = Colleague.new
-  #   project = Project.new("great title")
-  #   project2 = Project.new("another great title")
+  #   project = Project.new
+  #   project2 = Project.new
   #   project.start_time = Time.local(2012, 10, 9, 22, 53,57)
   #   proj_manager.add_project(project)
   #   proj_manager.add_project(project2)
@@ -318,8 +319,8 @@ class ColleagueTest < Test::Unit::TestCase
 
   def test_27e_Module_changes_start_time_after_project_added_to_file
     proj_manager = Colleague.new
-    project = Project.new("great title")
-    project2 = Project.new("another great title")
+    project = Project.new
+    project2 = Project.new
     project.start_time = Time.local(2012, 10, 9, 22, 53,57)
     proj_manager.add_project(project)
     proj_manager.add_project(project2)
@@ -331,7 +332,7 @@ class ColleagueTest < Test::Unit::TestCase
 
   def test_28_can_change_project_attributes_after_added_to_colleague
     proj_manager = Colleague.new
-    project = Project.new("great title")
+    project = Project.new
     project.start_time = Time.local(2012, 10, 9, 22, 53, 57)
     proj_manager.add_project(project)
     project.deadline = Time.local(2012,10,10, 22,53,57)
@@ -367,7 +368,7 @@ class ColleagueTest < Test::Unit::TestCase
 
   def test_30_can_change_project_title_after_added_to_colleague
     proj_manager = Colleague.new
-    project = Project.new("great title")
+    project = Project.new
     proj_manager.add_project(project)
     project.title = "new title"
     assert_equal "new title", project.title
@@ -376,7 +377,7 @@ class ColleagueTest < Test::Unit::TestCase
 
   def test_31_can_change_project_status_after_added_to_colleague
     proj_manager = Colleague.new
-    project = Project.new("great title")
+    project = Project.new
     proj_manager.add_project(project)
     project.status = :complete
     assert_equal :complete, project.status
@@ -385,7 +386,7 @@ class ColleagueTest < Test::Unit::TestCase
 
   def test_32_can_change_project_type_after_added_to_colleague
     proj_manager = Colleague.new
-    project = Project.new("great title")
+    project = Project.new
     proj_manager.add_project(project)
     project.type = "web development"
     assert_equal "web development", project.type
@@ -394,7 +395,7 @@ class ColleagueTest < Test::Unit::TestCase
 
   def test_33_can_change_project_notes_after_added_to_colleague
     proj_manager = Colleague.new
-    project = Project.new("great title")
+    project = Project.new
     proj_manager.add_project(project)
     project.notes = "important"
     assert_equal "important", project.notes
@@ -422,7 +423,7 @@ class ColleagueTest < Test::Unit::TestCase
 
   def test_35_can_change_project_client_after_added_to_colleague
     proj_manager = Colleague.new
-    project = Project.new("great title")
+    project = Project.new
     proj_manager.add_project(project)
     client2 = Client.new
     client2.first_name = "Glen"
@@ -433,7 +434,7 @@ class ColleagueTest < Test::Unit::TestCase
 
   def test_36_can_change_project_client_name_after_added_to_colleague
     proj_manager = Colleague.new
-    project = Project.new("great title")
+    project = Project.new
     proj_manager.add_project(project)
     client2 = Client.new
     client2.first_name = "Glen"
@@ -441,6 +442,42 @@ class ColleagueTest < Test::Unit::TestCase
     client2.first_name = "Sam"
     assert_equal "Sam", project.client.first_name
     File.open('lib/projects.csv', 'w') { |file| file.truncate(0) }
+  end  
+
+  def test_37_set_up_next_test
+    project = Project.new
+    project2 = Project.new
+    project2.title = "new title"
+    c = Colleague.new
+    c.add_project(project)
+    c.add_project(project2)
+  end
+
+  def test_38
+    colleague = Colleague.new
+    client_manager = Client_manager.new
+    setup = Setup.new(colleague, client_manager)
+    clients = setup.client_history
+    projects = setup.project_history
+    assert_equal 2, projects[1][:id].to_i
+  end
+  def test_38c
+    colleague = Colleague.new
+    client_manager = Client_manager.new
+    setup = Setup.new(colleague, client_manager)
+    clients = setup.client_history
+    projects = setup.project_history
+    assert_equal 2, colleague.projects.size
+  end
+
+  def test_38d
+    colleague = Colleague.new
+    client_manager = Client_manager.new
+    setup = Setup.new(colleague, client_manager)
+    clients = setup.client_history
+    projects = setup.project_history
+    project = setup.colleague.project(projects[1][:id].to_i)
+    assert_equal "new title", project.title
   end
 
 end

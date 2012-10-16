@@ -35,9 +35,10 @@ class Setup
 
   def project_history
     project_array = []
+    string = ""
     projects = read 
-    project = Project.new
     projects.each do |hash|
+      project = Project.new
       project.id = hash[:id].to_i
       project.title = hash[:title]
       project.type = hash[:type]
@@ -49,6 +50,7 @@ class Setup
       @colleague.add_past_project(project)
       project_array << project
     end
+    project_array
   end
 
 end

@@ -6,10 +6,11 @@ class Project
   include Project_file
   attr_reader :title, :status, :type, :notes, :start_time, :deadline, :client, :id
 
-  def initialize *title
-    if title.size == 1 
-      @title = title
-    end
+  def initialize
+    # if title.size == 1 
+    #   @title = title
+    # end
+    @title = "untitled"
     @status = :incomplete
     @start_time = Time.now
   end
