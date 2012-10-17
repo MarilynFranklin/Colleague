@@ -275,7 +275,18 @@ class ColleagueTest < Test::Unit::TestCase
   #   assert_equal lines.each{ |line| line.to_s }, ["1,great title,,,2012-10-09 22:53:57 -0500,,incomplete,\n"]
   #   File.open('lib/projects.csv', 'w') { |file| file.truncate(0) }
   # end  
-
+  def test_24_lines_index_is_correct
+    proj_manager = Colleague.new
+    project = Project.new
+    project2 = Project.new
+    project3 = Project.new
+    proj_manager.add_project(project)
+    proj_manager.add_project(project2)
+    proj_manager.add_project(project3)
+    projects = read
+    assert_equal 1, line_index(project2.id, projects)
+    File.open('lib/projects.csv', 'w') { |file| file.truncate(0) }
+  end
   def test_27_colleague_sets_project_id_to_match_num_projects
     proj_manager = Colleague.new
     project = Project.new
@@ -292,6 +303,68 @@ class ColleagueTest < Test::Unit::TestCase
     assert_equal 2, project2.id
     File.open('lib/projects.csv', 'w') { |file| file.truncate(0) }
   end 
+  def test_27c_colleague_keeps_track_of_active_projects
+    proj_manager = Colleague.new
+    project = Project.new
+    project2 = Project.new
+    proj_manager.add_project(project)
+    proj_manager.add_project(project2)
+    assert_equal 2, proj_manager.active_projects
+    File.open('lib/projects.csv', 'w') { |file| file.truncate(0) }
+  end
+  def test_27d_remove_project_removes_project_from_projects_array
+    proj_manager = Colleague.new
+    project = Project.new
+    project2 = Project.new
+    project3 = Project.new
+    proj_manager.add_project(project)
+    proj_manager.add_project(project2)
+    proj_manager.add_project(project3)
+    proj_manager.remove_project(project3)
+    assert_equal false, proj_manager.projects.include?(project3)
+    File.open('lib/projects.csv', 'w') { |file| file.truncate(0) }
+    File.open('lib/projects_archive.csv', 'w') { |file| file.truncate(0) }
+  end
+ #  def test_27e_remove_project_removes_project_from_projectscsv
+ #    proj_manager = Colleague.new
+ #    project = Project.new
+ #    project2 = Project.new
+ #    project3 = Project.new
+ #    proj_manager.add_project(project)
+ #    proj_manager.add_project(project2)
+ #    proj_manager.add_project(project3)
+ #    proj_manager.remove_project(project3)
+ #    assert_equal [{:id=>"1",
+ #  :title=>"untitled",
+ #  :deadline=>"0",
+ #  :type=>"",
+ #  :start=>"1350493476",
+ #  :notes=>"",
+ #  :status=>"incomplete",
+ #  :client=>"\n"},
+ # {:id=>"2",
+ #  :title=>"untitled",
+ #  :deadline=>"0",
+ #  :type=>"",
+ #  :start=>"1350493476",
+ #  :notes=>"",
+ #  :status=>"incomplete",
+ #  :client=>"\n"}], read
+ #    File.open('lib/projects.csv', 'w') { |file| file.truncate(0) }
+ #  end
+  # def test_27f_remove_project_adds_project_to_projects_archivecsv
+  #   proj_manager = Colleague.new
+  #   project = Project.new
+  #   project2 = Project.new
+  #   project3 = Project.new
+  #   proj_manager.add_project(project)
+  #   proj_manager.add_project(project2)
+  #   proj_manager.add_project(project3)
+  #   proj_manager.remove_project(project3)
+  #   assert_equal [], read_archive
+  #   File.open('lib/projects.csv', 'w') { |file| file.truncate(0) }
+  #   File.open('lib/projects_archive.csv', 'w') { |file| file.truncate(0) }
+  # end
 #==============Module tests================#
   # def test_27c_Module_reads_file
   #   proj_manager = Colleague.new

@@ -12,6 +12,7 @@ Shoes.app :title => 'Colleague', :width => 1000 do
   setup.client_history
   setup.project_history
 
+  @history = stack
 #==================Project Methods====================#
   def color(project)
     return green if project.status == :complete
@@ -24,6 +25,7 @@ Shoes.app :title => 'Colleague', :width => 1000 do
       black
     end
   end
+
   def refresh 
     @history.clear do 
       @colleague.projects.each do |project|
@@ -61,6 +63,10 @@ Shoes.app :title => 'Colleague', :width => 1000 do
       title_slot = flow do
         button "view" do
           open_edit_window(project, self, :refresh, @client_manager)
+        end
+        button "remove" do
+          @colleague.remove_project(project)
+          refresh
         end
         c = check; title = para "#{project.title}", :stroke => color(project)
         c.click(){ update_status(project, self) }
@@ -132,6 +138,10 @@ Shoes.app :title => 'Colleague', :width => 1000 do
   end
   client_add.hide()
 
+#================== Display / sort buttons ====================#
+
+
+
   view = flow do
     projects = stack(:width => 1) do
       button "View Projects" do
@@ -139,52 +149,50 @@ Shoes.app :title => 'Colleague', :width => 1000 do
         project_add.show()
         client_add.hide()
         view.hide()
-        due_by.show()
       end
     end
   end
+  sort_box = stack
+  client_picker = flow do
+    list = ["Client:"]
+    @client_manager.clients.each{ |client| list << "#{client.id} #{client.first_name} #{client.last_name}"}
+    clients = list_box :items => list
+    clients.change() do
+      client = @client_manager.client(clients.text[/^\d+/].to_i)
+      sort_by(:client, client)
+      client_picker.hide()
+      sort_box.show()
+    end
+  end
+  client_picker.hide()
 
-  due_by = flow do
-    button "Due Today" do 
+  sort = ["Sort By:", "Due Today", "Due This Week", "Clients"]
+
+  sort_box = list_box :items =>sort
+  sort_box.choose(item:'Sort By:')
+  sort_box.change() do
+    if "Due Today" == sort_box.text
       view(:is_urgent?)
-      client_add.hide()
-      project_add.hide()
       view.show()
-    end
-
-    button "Due This Week" do
+    elsif "Due This Week" == sort_box.text
       view(:is_due_this_week?)
+      view.show()
+    elsif "Clients" == sort_box.text
       client_add.hide()
       project_add.hide()
+      sort_box.hide()
       view.show()
-    end
-  end
-
-  sort_by = flow do
-    button "sort by clients" do
-      client_add.hide()
-      project_add.hide()
-      view.show()
-      due_by.hide()
       @history.clear{  }
-      list = []
-      @client_manager.clients.each{ |client| list << "#{client.id} #{client.first_name} #{client.last_name}"}
-      clients = list_box :items => list
-      clients.change() do
-        client = @client_manager.client(clients.text[/^\d+/].to_i)
-        sort_by(:client, client)
-        clients.hide()
-      end
-      clients.show()
-    end
+      client_picker.show()
+    end      
   end
-
 
   @history = stack
   @history.append do
     refresh
   end
   view.hide()
+  project_add.show()
 
 #================== Client Edit Window ====================#
 
