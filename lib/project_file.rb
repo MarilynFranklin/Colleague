@@ -5,7 +5,7 @@ module Project_file
     projects = []
     while (line = file.gets)
       columns = line.split(",")
-      projects.push({id: columns[0], title: columns[1], deadline: columns[2], type: columns[3], start: columns[4], notes: columns[5], status: columns[6], client: columns[7] })      
+      projects.push({id: columns[0], title: columns[1], deadline: columns[2], type: columns[3], start: columns[4], notes: columns[5], status: columns[6], client: columns[7], checklist: columns[8] })      
     end
     file.close
     projects
@@ -52,7 +52,7 @@ module Project_file
     projects = []
     while (line = file.gets)
       columns = line.split(",")
-      projects.push({id: columns[0], title: columns[1], deadline: columns[2], type: columns[3], start: columns[4], notes: columns[5], status: columns[6], client: columns[7] })      
+      projects.push({id: columns[0], title: columns[1], deadline: columns[2], type: columns[3], start: columns[4], notes: columns[5], status: columns[6], client: columns[7], checklist: columns[8] })      
     end
     file.close
     projects

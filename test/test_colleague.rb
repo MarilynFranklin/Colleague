@@ -6,6 +6,7 @@ require 'constants'
 require 'project_file'
 require 'client_manager'
 require 'setup'
+require 'checklist'
 
 class ColleagueTest < Test::Unit::TestCase
   include Project_file
@@ -581,6 +582,35 @@ class ColleagueTest < Test::Unit::TestCase
   #   assert_equal nil, project.client
   # end
 
+
+  def test_37_projects_can_have_checklists
+    project = Project.new
+    checklist = Checklist.new
+    project.checklist = checklist
+    assert_equal checklist, project.checklist
+  end
+  def test_38_checklist_tasks_can_be_accessed_from_project
+    project = Project.new
+    checklist = Checklist.new
+    task = Project.new
+    task2 = Project.new
+    checklist.add_project(task)
+    checklist.add_project(task2)
+    project.checklist = checklist
+    assert_equal 2, project.checklist.num_projects
+  end
+  def test_39_Colleague_stores_checklist_with_project
+    c = Colleague.new
+    project = Project.new
+    checklist = Checklist.new
+    task = Project.new
+    task2 = Project.new
+    checklist.add_project(task)
+    checklist.add_project(task2)
+    project.checklist = checklist
+    c.add_project(project)
+    assert_equal [], read
+  end
 
 end
 

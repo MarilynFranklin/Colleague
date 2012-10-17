@@ -4,7 +4,7 @@ require_relative 'project_file'
 
 class Project
   include Project_file
-  attr_reader :title, :status, :type, :notes, :start_time, :deadline, :client, :id
+  attr_reader :title, :status, :type, :notes, :start_time, :deadline, :client, :id, :checklist
 
   def initialize
     # if title.size == 1 
@@ -65,6 +65,10 @@ class Project
 
   def title= new_title
     !id ? @title = new_title : @title = update(@id, :title, new_title)
+  end
+
+  def checklist= checklist
+    @checklist = checklist
   end
 
 end
