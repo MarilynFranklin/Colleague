@@ -40,6 +40,14 @@ Shoes.app :title => 'Colleague', :width => 1000 do
     end
   end
 
+  def sort_by(method, match)
+    @history.clear do
+      @colleague.projects.each do |project|
+        history_stack(project) if project.send(method) == match
+      end
+    end
+  end
+
   def history_stack(project)
     stack do
       def update_status(project, c)
@@ -131,23 +139,46 @@ Shoes.app :title => 'Colleague', :width => 1000 do
         project_add.show()
         client_add.hide()
         view.hide()
+        due_by.show()
       end
     end
   end
 
-  button "Due Today" do 
-    view(:is_urgent?)
-    client_add.hide()
-    project_add.hide()
-    view.show()
+  due_by = flow do
+    button "Due Today" do 
+      view(:is_urgent?)
+      client_add.hide()
+      project_add.hide()
+      view.show()
+    end
+
+    button "Due This Week" do
+      view(:is_due_this_week?)
+      client_add.hide()
+      project_add.hide()
+      view.show()
+    end
   end
 
-  button "Due This Week" do
-    view(:is_due_this_week?)
-    client_add.hide()
-    project_add.hide()
-    view.show()
+  sort_by = flow do
+    button "sort by clients" do
+      client_add.hide()
+      project_add.hide()
+      view.show()
+      due_by.hide()
+      @history.clear{  }
+      list = []
+      @client_manager.clients.each{ |client| list << "#{client.id} #{client.first_name} #{client.last_name}"}
+      clients = list_box :items => list
+      clients.change() do
+        client = @client_manager.client(clients.text[/^\d+/].to_i)
+        sort_by(:client, client)
+        clients.hide()
+      end
+      clients.show()
+    end
   end
+
 
   @history = stack
   @history.append do
