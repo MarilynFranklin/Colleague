@@ -13,10 +13,30 @@ Shoes.app :title => 'Colleague', :width => 1000 do
   setup.project_history
 
 #==================Project Methods====================#
+  def color(project)
+    return if !project.deadline
+    if project.status == :complete
+      green 
+    elsif project.is_due_soon?
+      orange
+    elsif project.is_urgent?
+      red
+    else
+      black
+    end
+  end
   def refresh 
     @history.clear do 
       @colleague.projects.each do |project|
         history_stack(project)
+      end
+    end
+  end
+
+  def view(method)
+    @history.clear do
+      @colleague.projects.each do |project|
+        history_stack(project) if project.send(method)
       end
     end
   end
@@ -35,7 +55,7 @@ Shoes.app :title => 'Colleague', :width => 1000 do
         button "view" do
           open_edit_window(project, self, :refresh, @client_manager)
         end
-        c = check; title = para "#{project.title}", :stroke => project.status == :complete ? green : black
+        c = check; title = para "#{project.title}", :stroke => color(project)
         c.click(){ update_status(project, self) }
       end
     end
@@ -105,10 +125,29 @@ Shoes.app :title => 'Colleague', :width => 1000 do
   end
   client_add.hide()
 
+  view = flow do
+    projects = stack(:width => 1) do
+      button "View Projects" do
+        refresh
+        project_add.show()
+        client_add.hide()
+        view.hide()
+      end
+    end
+  end
+
+  button "Due Today" do 
+    view(:is_urgent?)
+    client_add.hide()
+    project_add.hide()
+    view.show()
+  end
+
   @history = stack
   @history.append do
     refresh
   end
+  view.hide()
 
 #================== Client Edit Window ====================#
 

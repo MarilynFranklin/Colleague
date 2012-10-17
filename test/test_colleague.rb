@@ -169,6 +169,17 @@ class ColleagueTest < Test::Unit::TestCase
     project.deadline= Time.now + (3.5 * DAY)
     assert_equal true, project.is_due_later?
   end
+  def test_20b_due_this_week
+    project = Project.new
+    project.deadline= Time.now + (7 * DAY)
+    assert_equal true, project.is_due_this_week?
+  end
+  def test_20c_due_this_week
+    project = Project.new
+    project.deadline= Time.now + (9 * DAY)
+    assert_equal false, project.is_due_this_week?
+  end
+
 #==============colleague object tests================#
   def test_21_colleague_is_object
     proj_manager = Colleague.new
@@ -491,6 +502,7 @@ class ColleagueTest < Test::Unit::TestCase
   #   project.client = nil
   #   assert_equal nil, project.client
   # end
+
 
 end
 

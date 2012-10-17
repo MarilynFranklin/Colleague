@@ -55,6 +55,10 @@ class Project
     time_till_due > (3 * DAY) ? true : false
   end
 
+  def is_due_this_week?
+    time_till_due <= (7 * DAY) ? true : false
+  end
+
   def id= project_number
     @id = project_number
   end
