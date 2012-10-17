@@ -44,7 +44,7 @@ class Setup
       project.type = hash[:type]
       project.notes = hash[:notes]
       project.status = hash[:status].to_sym
-      project.deadline = Time.at(hash[:deadline].to_i)
+      project.deadline = hash[:deadline].to_i == 0 ? nil : Time.at(hash[:deadline].to_i)
       project.start_time = Time.at(hash[:start].to_i)
       project.client = @client_manager.client(hash[:client].to_i)
       @colleague.add_past_project(project)

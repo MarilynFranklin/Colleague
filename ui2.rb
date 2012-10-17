@@ -14,10 +14,9 @@ Shoes.app :title => 'Colleague', :width => 1000 do
 
 #==================Project Methods====================#
   def color(project)
+    return green if project.status == :complete
     return if !project.deadline
-    if project.status == :complete
-      green 
-    elsif project.is_due_soon?
+    if project.is_due_soon?
       orange
     elsif project.is_urgent?
       red
@@ -36,7 +35,7 @@ Shoes.app :title => 'Colleague', :width => 1000 do
   def view(method)
     @history.clear do
       @colleague.projects.each do |project|
-        history_stack(project) if project.send(method)
+        history_stack(project) if project.deadline && project.send(method) 
       end
     end
   end
@@ -138,6 +137,13 @@ Shoes.app :title => 'Colleague', :width => 1000 do
 
   button "Due Today" do 
     view(:is_urgent?)
+    client_add.hide()
+    project_add.hide()
+    view.show()
+  end
+
+  button "Due This Week" do
+    view(:is_due_this_week?)
     client_add.hide()
     project_add.hide()
     view.show()

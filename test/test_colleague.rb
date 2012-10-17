@@ -180,6 +180,11 @@ class ColleagueTest < Test::Unit::TestCase
     assert_equal false, project.is_due_this_week?
   end
 
+  def test_20d_deadline
+    project = Project.new
+    assert_equal nil, project.deadline
+  end
+
 #==============colleague object tests================#
   def test_21_colleague_is_object
     proj_manager = Colleague.new
