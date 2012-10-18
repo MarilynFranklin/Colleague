@@ -54,12 +54,12 @@ Shoes.app :title => 'Colleague', :width => 1000 do
   end
 
   def status_bar(project)
-    @status_bar = progress :width => 0.25
+     status_bar = progress :width => 0.25
      animate do |i|
       if project.status == :complete
-        @status_bar.fraction = 100
+        status_bar.fraction = 100
       else
-        @status_bar.fraction = project.checklist.percent_complete
+        status_bar.fraction = project.checklist.percent_complete
       end
      end
   end
@@ -79,7 +79,7 @@ Shoes.app :title => 'Colleague', :width => 1000 do
           open_edit_window(project, self, :refresh, @client_manager)
         end
         button "tasks" do 
-          open_task_window(project)
+          open_task_window(project, self, :refresh)
         end
         button "remove" do
           @colleague.remove_project(project)
@@ -87,9 +87,9 @@ Shoes.app :title => 'Colleague', :width => 1000 do
         end
         c = check; title = para "#{project.title}", :stroke => color(project)
         c.click(){ update_status(project, self) }
-        if project.checklist
+        # if project.checklist
           status_bar(project)
-        end
+        # end
  
       end
     end
@@ -216,12 +216,99 @@ Shoes.app :title => 'Colleague', :width => 1000 do
   project_add.show()
 
 #================== Tasks Window ====================#
-def open_task_window(project) 
+def open_task_window(project, shoes_object, method) 
   window :title => "Tasks for #{project.title}" do
     @project = project
+    @main_app = shoes_object
+    @refresh_history = method
+#================= begin task edit method ========================#
+  def open_edit_window(project, shoes_object, method, client_manager)
+        @window = window :title => project.title, :width => 1000 do
+          @main_app = shoes_object
+          @refresh_history = method
+        stack do
+          def edit_project_flow(project_object, caption, getter, setter)
+            edit = flow
+            slot = stack(:width => 200){ para "#{caption}: #{project_object.send getter}" }
+            button = stack(:width => 1) do
+              button 'edit' do
+                edit.show()
+                button.hide()
+              end
+            end
+            edit = flow(:width => 500) do
+              update = edit_line
+              button 'Add' do
+                project_object.send setter, update.text
+                slot.clear{ para "#{caption}: #{project_object.send getter}" }
+                edit.hide()
+                button.show()
+                @main_app.send(@refresh_history)
+              end
+            end
+            edit.hide()
+          end
+
+          def edit_time_flow(project_object, caption, getter, setter)
+            edit = flow 
+            slot = stack(:width => 200)do
+              if project_object.send( getter ).to_i == 0
+                para "#{caption}:"
+              else                  
+                para "#{caption}: #{project_object.send(getter).to_date}" 
+              end
+            end
+            button = stack(:width => 1) do
+              button 'edit' do
+                edit.show()
+                button.hide()
+              end
+            end
+            edit = flow(:width => 500) do
+                month_edit = edit_line(:width => 30)
+                para "/ " 
+                day_edit = edit_line(:width => 30)
+                para "/ " 
+                year_edit = edit_line(:width => 50)
+                para "( MM/DD/YYYY )" 
+              button 'Add' do
+                project_object.send setter, Time.local(year_edit.text.to_i, month_edit.text.to_i, day_edit.text.to_i)
+                slot.clear{ para "#{caption}: #{project_object.send(getter).to_date}" }
+                edit.hide()
+                button.show()
+                @main_app.send(@refresh_history)
+              end
+            end
+            edit.hide()
+
+          end 
+
+          flow do
+            edit_project_flow(project, 'Title', :title, :title=)
+          end
+
+          flow do
+            edit_time_flow(project, 'Start', :start_time, :start_time=)
+          end
+
+          flow do
+            edit_time_flow(project, 'Deadline', :deadline, :deadline=)
+          end
+
+          flow do  
+            edit_project_flow(project, 'Notes', :notes, :notes=)
+          end
+        end
+    end
+  end
+#================= end task edit method ========================#
 
     def list(task)
         flow do
+          button "view" do
+            # @main_app.send @open_edit[task, self, :refresh, @project]
+            open_edit_window(task, self, :refresh, @project)
+          end
           c = check; title = para "#{task.title}", :stroke => task.status == :complete ? green : black 
           c.click() do
             task.status == :complete ? task.status = :incomplete : task.status = :complete 
@@ -247,7 +334,7 @@ def open_task_window(project)
         end
         task.project = project
         project.checklist.add_task(task)
-        # refresh
+        @main_app.send(@refresh_history)
         @task_list.append do 
           list(task)
         end
@@ -392,6 +479,7 @@ end
           edit_project_flow(project, 'Project Type', :type, :type=)
         end
 
+        if project.class == Project
         flow do  
           edit = flow 
           slot = stack(:width => 200) do
@@ -430,6 +518,9 @@ end
           edit.hide()
 
         end
+        end
+
+
       end
     end
   end
