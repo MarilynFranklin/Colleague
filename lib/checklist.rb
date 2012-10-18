@@ -20,6 +20,14 @@ class Checklist < Colleague
     task.id = @@total_num_tasks
     @projects << task
   end
+  def remove_task(task)
+    @active_projects -= 1
+    @projects.delete(task)
+    delete(task.id)
+    CSV.open('lib/tasks_archive.csv', 'ab') do |csv|
+      csv << [@@total_num_tasks, task.title, task.deadline.to_i, task.type, task.start_time.to_i, task.notes, task.status, task.project ? task.project.id : nil]
+    end
+  end
 
   def num_complete
     complete_tasks = projects.select{ |task| task.status == :complete }

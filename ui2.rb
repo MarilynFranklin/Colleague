@@ -56,8 +56,10 @@ Shoes.app :title => 'Colleague', :width => 1000 do
   def status_bar(project)
      status_bar = progress :width => 0.25
      animate do |i|
-      if project.status == :complete
+      if project.status == :complete 
         status_bar.fraction = 100
+      elsif !project.checklist
+        status_bar.fraction = 0
       else
         status_bar.fraction = project.checklist.percent_complete
       end
@@ -79,7 +81,7 @@ Shoes.app :title => 'Colleague', :width => 1000 do
           open_edit_window(project, self, :refresh, @client_manager)
         end
         button "tasks" do 
-          open_task_window(project, self, :refresh)
+          open_task_window(project)
         end
         button "remove" do
           @colleague.remove_project(project)
@@ -87,9 +89,7 @@ Shoes.app :title => 'Colleague', :width => 1000 do
         end
         c = check; title = para "#{project.title}", :stroke => color(project)
         c.click(){ update_status(project, self) }
-        # if project.checklist
-          status_bar(project)
-        # end
+        status_bar(project)
  
       end
     end
@@ -216,11 +216,9 @@ Shoes.app :title => 'Colleague', :width => 1000 do
   project_add.show()
 
 #================== Tasks Window ====================#
-def open_task_window(project, shoes_object, method) 
+def open_task_window(project) 
   window :title => "Tasks for #{project.title}" do
     @project = project
-    @main_app = shoes_object
-    @refresh_history = method
 #================= begin task edit method ========================#
   def open_edit_window(project, shoes_object, method, client_manager)
         @window = window :title => project.title, :width => 1000 do
@@ -309,6 +307,10 @@ def open_task_window(project, shoes_object, method)
             # @main_app.send @open_edit[task, self, :refresh, @project]
             open_edit_window(task, self, :refresh, @project)
           end
+          button "remove" do
+            @project.checklist.remove_task(task)
+            refresh
+          end
           c = check; title = para "#{task.title}", :stroke => task.status == :complete ? green : black 
           c.click() do
             task.status == :complete ? task.status = :incomplete : task.status = :complete 
@@ -334,7 +336,6 @@ def open_task_window(project, shoes_object, method)
         end
         task.project = project
         project.checklist.add_task(task)
-        @main_app.send(@refresh_history)
         @task_list.append do 
           list(task)
         end

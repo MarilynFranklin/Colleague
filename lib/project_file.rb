@@ -44,11 +44,17 @@ module Project_file
   end 
 
   def delete(id)
-    projects = read
+    if self.class == Project
+      projects = read
+      file = "lib/projects.csv"
+    else
+      projects = read_tasks
+      file = "lib/tasks.csv"
+    end
     project_index = line_index(id, projects)
-    lines = File.readlines('lib/projects.csv')
+    lines = File.readlines(file)
     lines.delete_at(project_index)
-    File.open('lib/projects.csv', 'w') do |csv|
+    File.open(file, 'w') do |csv|
       lines.each{ |line| csv.puts(line) }
     end
   end

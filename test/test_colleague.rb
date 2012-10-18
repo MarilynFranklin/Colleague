@@ -693,6 +693,19 @@ class ColleagueTest < Test::Unit::TestCase
     assert_equal 0.25, checklist.percent_complete
     File.open('lib/tasks.csv', 'w') { |file| file.truncate(0) }
   end
+  def test_43_remove_task_removes_task_from_projects_array
+    checklist = Checklist.new
+    task = Task.new
+    task2 = Task.new
+    task3 = Task.new
+    checklist.add_task(task)
+    checklist.add_task(task2)
+    checklist.add_task(task3)
+    checklist.remove_task(task3)
+    assert_equal false, checklist.projects.include?(task3)
+    File.open('lib/tasks.csv', 'w') { |file| file.truncate(0) }
+    File.open('lib/tasks_archive.csv', 'w') { |file| file.truncate(0) }
+  end
 
 end
 
