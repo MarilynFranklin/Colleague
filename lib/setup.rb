@@ -12,11 +12,12 @@ class Setup
   include Client_file
   include Project_file
 
-  attr_reader :colleague, :client_manager
+  attr_reader :colleague, :client_manager, :tasks
 
   def initialize colleague, client_manager
     @colleague = colleague
     @client_manager = client_manager
+    @tasks = []
   end
 
   def client_history
@@ -70,7 +71,35 @@ class Setup
           task.id = hash[:id].to_i
           task.title = hash[:title]
           task.status = hash[:status].to_sym
+          task.deadline = hash[:deadline].to_i == 0 ? nil : Time.at(hash[:deadline].to_i)
+          task.start_time = Time.at(hash[:start].to_i)
+          task.time_estimate = hash[:time_estimate].to_i == 0 ? nil : hash[:time_estimate].to_i
+          # task temporarily saves the id of it's dependent task this will be reset to hold the actual object 
+          # in dependent_task_history
+          task.dependent_task = hash[:dependent_task].to_i == 0 ? nil : hash[:dependent_task].to_i
+          @tasks << task
         end
+      end
+    end
+  end
+
+  def dependent_task_history
+    # task_hash = read_tasks
+    # @tasks.each do |task|
+    #   if task.dependent_task
+    #     task_hash.each do |hash|
+    #       if task.dependent_task == hash[:id].to_i
+            
+    #       end
+    #     end
+    #   end
+    # end
+    projects_with_checklists = @colleague.projects.select{ |project| project.checklist }
+    projects_with_checklists.each do |project|
+      checklist = project.checklist
+      dependent_tasks = project.checklist.projects.select{ |task| task.dependent_task }
+      dependent_tasks.each do |task|
+        task.dependent_task = checklist.project(task.dependent_task)
       end
     end
   end

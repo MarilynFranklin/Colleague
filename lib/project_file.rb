@@ -28,8 +28,8 @@ module Project_file
       file = "lib/tasks.csv"
     end
     project_index = line_index(id, projects)
-    if key == :client
-      value ? projects[project_index][key] = value.id : value
+    if key == :client || key == :dependent_task
+      value.nil? ? projects[project_index][key] = nil : projects[project_index][key] = value.id
     elsif key == :deadline || key == :start
       projects[project_index][key] = value.to_i
     else
@@ -64,7 +64,7 @@ module Project_file
     projects = []
     while (line = file.gets)
       columns = line.split(",")
-      projects.push({id: columns[0], title: columns[1], deadline: columns[2], type: columns[3], start: columns[4], notes: columns[5], status: columns[6], client: columns[7] })      
+      projects.push({id: columns[0], title: columns[1], deadline: columns[2], type: columns[3], start: columns[4], notes: columns[5], status: columns[6], client: columns[7], time_estimate: columns[8], dependent_task: columns[9]  })      
     end
     file.close
     projects
@@ -75,7 +75,7 @@ module Project_file
     projects = []
     while (line = file.gets)
       columns = line.split(",")
-      projects.push({id: columns[0], title: columns[1], deadline: columns[2], type: columns[3], start: columns[4], notes: columns[5], status: columns[6], project: columns[7] })      
+      projects.push({id: columns[0], title: columns[1], deadline: columns[2], type: columns[3], start: columns[4], notes: columns[5], status: columns[6], project: columns[7], time_estimate: columns[8], dependent_task: columns[9] })      
     end
     file.close
     projects

@@ -706,6 +706,94 @@ class ColleagueTest < Test::Unit::TestCase
     File.open('lib/tasks.csv', 'w') { |file| file.truncate(0) }
     File.open('lib/tasks_archive.csv', 'w') { |file| file.truncate(0) }
   end
+  def test_44_task_have_time_estimate
+    task = Task.new
+    time = Time.local(2012, 3, 2)
+    task.start_time =  time
+    task.time_estimate= 3
+    assert_equal 3, task.time_estimate
+    File.open('lib/tasks.csv', 'w') { |file| file.truncate(0) }
+  end
+  def test_45_time_estimate_calculates_deadline
+    task = Task.new
+    time = Time.local(2012, 3, 2)
+    task.start_time =  time
+    task.time_estimate= 3
+    assert_equal time + (3 * DAY), task.deadline
+    File.open('lib/tasks.csv', 'w') { |file| file.truncate(0) }
+  end
+  def test_46_time_estimate_recalculate_deadline_if_start_time_is_changed
+    task = Task.new
+    time = Time.local(2012, 3, 2)
+    task.time_estimate= 3
+    task.start_time =  time
+    assert_equal time + (3 * DAY), task.deadline
+    File.open('lib/tasks.csv', 'w') { |file| file.truncate(0) }
+  end
+  def test_47_task_can_have_dependent_tasks
+    task = Task.new
+    task2 = Task.new
+    task.dependent_task = task2
+    assert_equal task2 , task.dependent_task
+    File.open('lib/tasks.csv', 'w') { |file| file.truncate(0) }
+  end
+  def test_48_dependent_tasks_start_on_deadline_of_parent_task
+    task = Task.new
+    time = Time.local(2012, 3, 2)
+    task.time_estimate= 3
+    task.start_time =  time
+    task2 = Task.new
+    task.dependent_task = task2
+    assert_equal time + (3 * DAY) , task2.start_time
+    File.open('lib/tasks.csv', 'w') { |file| file.truncate(0) }
+  end
+  def test_49_dependent_tasks_start_on_deadline_of_parent_task
+    task = Task.new
+    time = Time.local(2012, 3, 2)
+    task.time_estimate= 3
+    task.start_time =  time
+    task2 = Task.new
+    checklist = Checklist.new
+    checklist.add_task(task)
+    checklist.add_task(task2)
+    task.dependent_task = task2
+    assert_equal time + (3 * DAY) , task2.start_time
+    File.open('lib/tasks.csv', 'w') { |file| file.truncate(0) }
+  end
+  def test_50_dependent_tasks_can_be_set_to_nil
+    task = Task.new
+    time = Time.local(2012, 3, 2)
+    task.time_estimate= 3
+    task.start_time =  time
+    task2 = Task.new
+    task3 = Task.new
+    checklist = Checklist.new
+    checklist.add_task(task)
+    checklist.add_task(task2)
+    checklist.add_task(task3)
+    task.dependent_task = task2
+    task.dependent_task = nil
+    assert_equal nil , task.dependent_task
+    File.open('lib/tasks.csv', 'w') { |file| file.truncate(0) }
+  end
+  def test_51_dependent_tasks_can_be_set_to_nil
+    task = Task.new
+    time = Time.local(2012, 3, 2)
+    task.time_estimate= 3
+    task.start_time =  time
+    task2 = Task.new
+    task2.time_estimate = 3
+    task3 = Task.new
+    task3.time_estimate = 3
+    checklist = Checklist.new
+    checklist.add_task(task)
+    checklist.add_task(task2)
+    checklist.add_task(task3)
+    task.dependent_task = task2
+    task2.dependent_task = task3
+    assert_equal 9, checklist.dependent_time_span
+    File.open('lib/tasks.csv', 'w') { |file| file.truncate(0) }
+  end
 
 end
 

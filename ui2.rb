@@ -6,6 +6,7 @@ require 'lib/project_file'
 require 'lib/setup'
 require 'lib/task'
 require 'lib/checklist'
+require 'lib/constants'
 
 Shoes.app :title => 'Colleague', :width => 1000 do
   @colleague = Colleague.new
@@ -14,6 +15,7 @@ Shoes.app :title => 'Colleague', :width => 1000 do
   setup.client_history
   setup.project_history
   setup.task_history
+  setup.dependent_task_history
 
   @history = stack
 #==================Project Methods====================#
@@ -219,13 +221,52 @@ Shoes.app :title => 'Colleague', :width => 1000 do
 def open_task_window(project) 
   window :title => "Tasks for #{project.title}" do
     @project = project
+#================= begin chart view method ========================#
+def open_chart_window(project)
+  @window = window :title => project.title, :width => 1000 do
+    dependent_tasks = project.checklist.projects.select{ |task| task.dependent_task }
+    dependent_tasks.sort_by!{ |task| task.start_time }
+      final_one = dependent_tasks.last.dependent_task
+    flow do
+      para "#{dependent_tasks[0].start_time.year}"
+    end
+
+    flow do
+      date = dependent_tasks[0].start_time
+      project.checklist.dependent_time_span.to_i.times do
+        para "| #{date.strftime("%b %d")} "
+        date = date + DAY
+      end
+      para "|"
+    end
+    stack do
+      margin = 0
+      dependent_tasks.each do |task|
+        flow :margin_left => margin do 
+          background blue, :width => (task.time_estimate * 63)
+          para "#{task.title}", :stroke => white
+          margin += (task.time_estimate * 63) if task.time_estimate
+          # time_status = progress :width => margin
+        end
+      end
+      final_one = dependent_tasks.last.dependent_task
+      flow :margin_left => margin do
+        background blue, :width => (final_one.time_estimate * 63)
+        para "#{final_one.title}", :stroke => white
+      end
+    end
+  end
+end
+#================= end chart view method ========================#
 #================= begin task edit method ========================#
-  def open_edit_window(project, shoes_object, method, client_manager)
+  def open_edit_window(project, shoes_object, method, parent_project_object)
         @window = window :title => project.title, :width => 1000 do
           @main_app = shoes_object
           @refresh_history = method
+          @parent_project = parent_project_object
         stack do
           def edit_project_flow(project_object, caption, getter, setter)
+            # @parent_project = project_object
             edit = flow
             slot = stack(:width => 200){ para "#{caption}: #{project_object.send getter}" }
             button = stack(:width => 1) do
@@ -285,16 +326,90 @@ def open_task_window(project)
             edit_project_flow(project, 'Title', :title, :title=)
           end
 
-          flow do
+          @start = flow do
             edit_time_flow(project, 'Start', :start_time, :start_time=)
           end
 
-          flow do
+          @deadline = flow do
             edit_time_flow(project, 'Deadline', :deadline, :deadline=)
+          end
+
+          flow do
+            edit = flow 
+            slot = stack(:width => 200)do
+              if project.time_estimate.to_i == 0
+                para "Time Estimate:"
+              else                  
+                para "Time Estimate: #{project.time_estimate.to_i} days" 
+              end
+            end
+            button = stack(:width => 1) do
+              button 'edit' do
+                edit.show()
+                button.hide()
+              end
+            end
+            edit = flow(:width => 500) do
+                time_edit = edit_line(:width => 60)
+                para "(days)" 
+              button 'Add' do
+                project.time_estimate = time_edit.text.to_i
+                slot.clear{ para "Time Estimate: #{project.time_estimate.to_i} days" }
+                @deadline.clear{ edit_time_flow(project, 'Deadline', :deadline, :deadline=) }
+                edit.hide()
+                button.show()
+                # refresh
+              end
+            end
+            edit.hide()
+            @main_app.send(@refresh_history)
+
           end
 
           flow do  
             edit_project_flow(project, 'Notes', :notes, :notes=)
+          end
+
+          flow do    
+            edit = flow 
+            slot = stack(:width => 200) do
+              if project.dependent_task
+                para "Dependent task: #{project.dependent_task.title}" 
+              else
+                para "Dependent task: "
+              end
+            end
+            button = stack(:width => 1) do
+              button 'edit' do
+                edit.show()
+                button.hide()
+              end
+            end
+            edit = flow(:width => 500) do
+              list = [" "]
+              @parent_project.checklist.projects.each do |task|
+                list << "#{task.id} #{task.title}" if project != task && task.dependent_task != project
+              end
+              task_edit = list_box :items => list
+              task_edit.change() do
+                id = task_edit.text[/^\d+/].to_i
+                task_edit.text == "" ?  task = nil : task = @parent_project.checklist.project(task_edit.text[/^\d+/].to_i)
+                project.dependent_task = task
+                slot.clear do
+                  if project.dependent_task
+                    para "Dependent task: #{project.dependent_task.title}"   
+                  else 
+                    para "Dependent task: "
+                  end
+                end
+                @start.clear{ edit_time_flow(project, 'Start', :start_time, :start_time=) }
+                button.show()
+                edit.hide()
+              end
+            end
+            edit.hide()
+            @main_app.send(@refresh_history)
+
           end
         end
     end
@@ -340,6 +455,9 @@ def open_task_window(project)
           list(task)
         end
         @title.text = ""
+      end
+      button "View Chart" do
+        open_chart_window(project)
       end
     end
     @task_list = stack
@@ -480,7 +598,7 @@ end
           edit_project_flow(project, 'Project Type', :type, :type=)
         end
 
-        if project.class == Project
+        
         flow do  
           edit = flow 
           slot = stack(:width => 200) do
@@ -518,7 +636,6 @@ end
           end
           edit.hide()
 
-        end
         end
 
 
