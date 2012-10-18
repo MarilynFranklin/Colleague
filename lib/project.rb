@@ -69,6 +69,7 @@ class Project
 
   def checklist= checklist
     @checklist = checklist
+    checklist.projects.each { |task| task.project = self }
   end
 
 end

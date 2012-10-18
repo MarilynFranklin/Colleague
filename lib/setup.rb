@@ -4,6 +4,8 @@ require_relative 'colleague'
 require_relative 'client_manager'
 require_relative 'client'
 require_relative 'client_file'
+require_relative 'task'
+require_relative 'checklist'
 
 class Setup
 
@@ -52,5 +54,26 @@ class Setup
     end
     project_array
   end
+
+  def task_history
+    tasks = read_tasks
+    tasks.each do |hash|
+      @colleague.projects.each do |project|
+        if hash[:project].to_i == project.id
+          task = Task.new
+          if !project.checklist
+            checklist = Checklist.new
+            project.checklist = checklist
+          end
+          task.project = project
+          project.checklist.add_past_task(task)
+          task.id = hash[:id].to_i
+          task.title = hash[:title]
+          task.status = hash[:status].to_sym
+        end
+      end
+    end
+  end
+
 
 end

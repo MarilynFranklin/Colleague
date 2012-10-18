@@ -20,7 +20,7 @@ class Colleague
     project.id = @num_projects
     @projects << project
     CSV.open('lib/projects.csv', 'ab') do |csv|
-      csv << [@num_projects, project.title, project.deadline.to_i, project.type, project.start_time.to_i, project.notes, project.status, project.client ? project.client.id : nil, project.checklist]
+      csv << [@num_projects, project.title, project.deadline.to_i, project.type, project.start_time.to_i, project.notes, project.status, project.client ? project.client.id : nil]
     end
   end
 
@@ -29,7 +29,7 @@ class Colleague
     @projects.delete(project)
     delete(project.id)
     CSV.open('lib/projects_archive.csv', 'ab') do |csv|
-      csv << [@num_projects, project.title, project.deadline.to_i, project.type, project.start_time.to_i, project.notes, project.status, project.client ? project.client.id : nil, project.checklist]
+      csv << [@num_projects, project.title, project.deadline.to_i, project.type, project.start_time.to_i, project.notes, project.status, project.client ? project.client.id : nil]
     end
   end
 

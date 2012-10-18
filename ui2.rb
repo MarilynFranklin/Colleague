@@ -4,6 +4,8 @@ require 'lib/project'
 require 'lib/colleague'
 require 'lib/project_file'
 require 'lib/setup'
+require 'lib/task'
+require 'lib/checklist'
 
 Shoes.app :title => 'Colleague', :width => 1000 do
   @colleague = Colleague.new
@@ -11,6 +13,7 @@ Shoes.app :title => 'Colleague', :width => 1000 do
   setup = Setup.new(@colleague, @client_manager)
   setup.client_history
   setup.project_history
+  setup.task_history
 
   @history = stack
 #==================Project Methods====================#
@@ -50,6 +53,17 @@ Shoes.app :title => 'Colleague', :width => 1000 do
     end
   end
 
+  def status_bar(project)
+    @status_bar = progress :width => 0.25
+     animate do |i|
+      if project.status == :complete
+        @status_bar.fraction = 100
+      else
+        @status_bar.fraction = project.checklist.percent_complete
+      end
+     end
+  end
+
   def history_stack(project)
     stack do
       def update_status(project, c)
@@ -64,12 +78,19 @@ Shoes.app :title => 'Colleague', :width => 1000 do
         button "view" do
           open_edit_window(project, self, :refresh, @client_manager)
         end
+        button "tasks" do 
+          open_task_window(project)
+        end
         button "remove" do
           @colleague.remove_project(project)
           refresh
         end
         c = check; title = para "#{project.title}", :stroke => color(project)
         c.click(){ update_status(project, self) }
+        if project.checklist
+          status_bar(project)
+        end
+ 
       end
     end
   end
@@ -193,6 +214,52 @@ Shoes.app :title => 'Colleague', :width => 1000 do
   end
   view.hide()
   project_add.show()
+
+#================== Tasks Window ====================#
+def open_task_window(project) 
+  window :title => "Tasks for #{project.title}" do
+    @project = project
+
+    def list(task)
+        flow do
+          c = check; title = para "#{task.title}", :stroke => task.status == :complete ? green : black 
+          c.click() do
+            task.status == :complete ? task.status = :incomplete : task.status = :complete 
+            refresh
+          end
+        end
+    end
+    def refresh
+      @task_list.clear do 
+        @project.checklist.projects.each do |task|
+          list(task)
+        end
+      end
+    end
+    task_add = flow do
+      @title = edit_line
+      button "Add Task" do
+        task = Task.new
+        task.title = @title.text
+        if !project.checklist
+          checklist = Checklist.new
+          project.checklist = checklist
+        end
+        task.project = project
+        project.checklist.add_task(task)
+        # refresh
+        @task_list.append do 
+          list(task)
+        end
+        @title.text = ""
+      end
+    end
+    @task_list = stack
+    @task_list.append do
+      refresh if project.checklist
+    end
+  end
+end
 
 #================== Client Edit Window ====================#
 

@@ -7,6 +7,7 @@ require 'project_file'
 require 'client_manager'
 require 'setup'
 require 'checklist'
+require 'task'
 
 class ColleagueTest < Test::Unit::TestCase
   include Project_file
@@ -592,24 +593,105 @@ class ColleagueTest < Test::Unit::TestCase
   def test_38_checklist_tasks_can_be_accessed_from_project
     project = Project.new
     checklist = Checklist.new
-    task = Project.new
-    task2 = Project.new
-    checklist.add_project(task)
-    checklist.add_project(task2)
+    task = Task.new
+    task2 = Task.new
+    checklist.add_task(task)
+    checklist.add_task(task2)
     project.checklist = checklist
     assert_equal 2, project.checklist.num_projects
+    File.open('lib/tasks.csv', 'w') { |file| file.truncate(0) }
   end
   def test_39_Colleague_stores_checklist_with_project
     c = Colleague.new
     project = Project.new
     checklist = Checklist.new
-    task = Project.new
-    task2 = Project.new
-    checklist.add_project(task)
-    checklist.add_project(task2)
+    task = Task.new
+    task2 = Task.new
+    checklist.add_task(task)
+    checklist.add_task(task2)
     project.checklist = checklist
     c.add_project(project)
-    assert_equal [], read
+    assert_equal checklist, project.checklist
+    File.open('lib/tasks.csv', 'w') { |file| file.truncate(0) }
+  end
+  def test_40_tasks_know_what_project_they_belong_to
+    project = Project.new
+    checklist = Checklist.new
+    task = Task.new
+    checklist.add_task(task)
+    task.project = project
+    assert_equal project, task.project
+    File.open('lib/tasks.csv', 'w') { |file| file.truncate(0) }
+  end
+  def test_41_task_projects_are_set_when_checklist_is_added_to_project
+    project = Project.new
+    checklist = Checklist.new
+    task = Task.new
+    checklist.add_task(task)
+    project.checklist = checklist
+    assert_equal project, task.project
+    File.open('lib/tasks.csv', 'w') { |file| file.truncate(0) }
+  end
+  # def test_42_task_csv_stores_project_id
+  #   colleague = Colleague.new
+  #   project = Project.new
+  #   colleague.add_project(project)
+  #   checklist = Checklist.new
+  #   task = Task.new
+  #   task.project = project
+  #   checklist.add_task(task)
+  #   assert_equal task.project.id, read_tasks
+  #   # File.open('lib/tasks.csv', 'w') { |file| file.truncate(0) }
+  #   File.open('lib/projects.csv', 'w') { |file| file.truncate(0) }
+  # end
+  # def test_43_task_csv_stores_project_id
+  #   colleague = Colleague.new
+  #   project = Project.new
+  #   colleague.add_project(project)
+  #   checklist = Checklist.new
+  #   task = Task.new
+  #   task.project = project
+  #   checklist.add_task(task)
+  #   task.title = "title"
+  #   assert_equal '', task.id
+  #   # File.open('lib/tasks.csv', 'w') { |file| file.truncate(0) }
+  #   # File.open('lib/projects.csv', 'w') { |file| file.truncate(0) }
+  # end
+  def test_42_tasks_can_be_marked_as_complete
+    project = Project.new
+    checklist = Checklist.new
+    task = Task.new
+    checklist.add_task(task)
+    project.checklist = checklist
+    task.status = :complete
+    assert_equal :complete, task.status
+    File.open('lib/tasks.csv', 'w') { |file| file.truncate(0) }
+  end
+  def test_43_num_complete_returns_number_of_complete_tasks
+    checklist = Checklist.new
+    task = Task.new
+    task2 = Task.new
+    task3 = Task.new
+    checklist.add_task(task)
+    checklist.add_task(task2)
+    checklist.add_task(task3)
+    task.status = :complete
+    assert_equal 1, checklist.num_complete
+    File.open('lib/tasks.csv', 'w') { |file| file.truncate(0) }
+  end
+  def test_43_percent_complete_returns_percent_of_completed_tasks
+    checklist = Checklist.new
+    task = Task.new
+    task2 = Task.new
+    task3 = Task.new
+    task4 = Task.new
+    checklist.add_task(task)
+    checklist.add_task(task2)
+    checklist.add_task(task3)
+    checklist.add_task(task4)
+    task.status = :complete
+    assert_equal 0.25, checklist.percent_complete
+    File.open('lib/tasks.csv', 'w') { |file| file.truncate(0) }
   end
 
 end
