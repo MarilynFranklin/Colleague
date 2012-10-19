@@ -84,16 +84,6 @@ class Setup
   end
 
   def dependent_task_history
-    # task_hash = read_tasks
-    # @tasks.each do |task|
-    #   if task.dependent_task
-    #     task_hash.each do |hash|
-    #       if task.dependent_task == hash[:id].to_i
-            
-    #       end
-    #     end
-    #   end
-    # end
     projects_with_checklists = @colleague.projects.select{ |project| project.checklist }
     projects_with_checklists.each do |project|
       checklist = project.checklist

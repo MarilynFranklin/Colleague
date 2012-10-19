@@ -127,6 +127,7 @@ Shoes.app :title => 'Colleague', :width => 1000 do
       project = Project.new
       project.title = @title.text
       @colleague.add_project(project)
+      @title.text = ""
       refresh
     end
     view = stack(:width => 1) do
@@ -254,7 +255,6 @@ def open_chart_window(project)
           background palegreen, :width => (task.time_estimate * 81)
           para "#{task.title}"
           margin += (task.time_estimate * 81) if task.time_estimate
-          # time_status = progress :width => margin
         end
       end
       final_one = dependent_tasks.last.dependent_task
@@ -276,7 +276,6 @@ end
           @parent_project = parent_project_object
         stack do
           def edit_project_flow(project_object, caption, getter, setter)
-            # @parent_project = project_object
             edit = flow
             slot = stack(:width => 200){ para "#{caption}: #{project_object.send getter}" }
             button = stack(:width => 1) do
@@ -368,7 +367,6 @@ end
                 @deadline.clear{ edit_time_flow(project, 'Deadline', :deadline, :deadline=) }
                 edit.hide()
                 button.show()
-                # refresh
               end
             end
             edit.hide()
@@ -429,7 +427,6 @@ end
     def list(task)
         flow do
           button "view" do
-            # @main_app.send @open_edit[task, self, :refresh, @project]
             open_edit_window(task, self, :refresh, @project)
           end
           button "remove" do
