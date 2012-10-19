@@ -120,6 +120,7 @@ Shoes.app :title => 'Colleague', :width => 1000 do
 #==================Main Window View====================#
 
   client_add = flow
+  sort_box = stack
   project_add = flow do
     @title = edit_line
     button "Add project" do
@@ -133,6 +134,7 @@ Shoes.app :title => 'Colleague', :width => 1000 do
         refresh_clients
         project_add.hide()
         client_add.show()
+        sort_box.hide()
       end
     end
   end
@@ -155,6 +157,7 @@ Shoes.app :title => 'Colleague', :width => 1000 do
           refresh
           project_add.show()
           client_add.hide()
+          sort_box.show()
         end
       end
     end
@@ -175,7 +178,6 @@ Shoes.app :title => 'Colleague', :width => 1000 do
       end
     end
   end
-  sort_box = stack
   client_picker = flow do
     list = ["Client:"]
     @client_manager.clients.each{ |client| list << "#{client.id} #{client.first_name} #{client.last_name}"}
@@ -223,38 +225,46 @@ def open_task_window(project)
     @project = project
 #================= begin chart view method ========================#
 def open_chart_window(project)
-  @window = window :title => project.title, :width => 1000 do
+  @window = window :title => project.title, :width => 1250 do
+    
+
+   
+
     dependent_tasks = project.checklist.projects.select{ |task| task.dependent_task }
     dependent_tasks.sort_by!{ |task| task.start_time }
       final_one = dependent_tasks.last.dependent_task
+    main_content = flow do
     flow do
-      para "#{dependent_tasks[0].start_time.year}"
+      para "  #{dependent_tasks[0].start_time.year}"
     end
 
     flow do
       date = dependent_tasks[0].start_time
-      project.checklist.dependent_time_span.to_i.times do
-        para "| #{date.strftime("%b %d")} "
+      para "  "
+      15.times do
+        para "|   #{date.strftime("%m - %d")}   "
         date = date + DAY
       end
       para "|"
     end
     stack do
-      margin = 0
+      margin = 18
       dependent_tasks.each do |task|
         flow :margin_left => margin do 
-          background blue, :width => (task.time_estimate * 63)
-          para "#{task.title}", :stroke => white
-          margin += (task.time_estimate * 63) if task.time_estimate
+          background palegreen, :width => (task.time_estimate * 81)
+          para "#{task.title}"
+          margin += (task.time_estimate * 81) if task.time_estimate
           # time_status = progress :width => margin
         end
       end
       final_one = dependent_tasks.last.dependent_task
       flow :margin_left => margin do
-        background blue, :width => (final_one.time_estimate * 63)
-        para "#{final_one.title}", :stroke => white
+        background palegreen, :width => (final_one.time_estimate * 81)
+        para "#{final_one.title}"
       end
     end
+    end
+
   end
 end
 #================= end chart view method ========================#
@@ -456,8 +466,17 @@ end
         end
         @title.text = ""
       end
-      button "View Chart" do
-        open_chart_window(project)
+
+#===========================================================================================
+      if project.checklist
+        dependent_tasks = project.checklist.projects.select{ |task| task.dependent_task  if project.checklist }
+        dependent_tasks.sort_by!{ |task| task.start_time }
+        if dependent_tasks.size != 0 && project.checklist.have_time_estimate?(dependent_tasks)
+          final_one = dependent_tasks.last.dependent_task
+          button "View Chart" do
+            open_chart_window(project)
+          end
+        end
       end
     end
     @task_list = stack
