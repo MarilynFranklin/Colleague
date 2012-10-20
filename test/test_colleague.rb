@@ -413,6 +413,17 @@ class ColleagueTest < Test::Unit::TestCase
     File.open('lib/tasks.csv', 'w') { |file| file.truncate(0) }
     File.open('lib/tasks_archive.csv', 'w') { |file| file.truncate(0) }
   end
+  def test_43_remove_project_removes_project
+    colleague = Checklist.new
+    project = Task.new
+    project2 = Task.new
+    project3 = Task.new
+    colleague.add_project(project)
+    colleague.add_project(project2)
+    colleague.add_project(project3)
+    colleague.remove_project(project3)
+    assert_equal [], read
+  end
   def test_44_task_have_time_estimate
     task = Task.new
     time = Time.local(2012, 3, 2)

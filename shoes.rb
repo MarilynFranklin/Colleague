@@ -92,10 +92,10 @@ Shoes.app :title => 'Colleague', :width => 1000 do
         c = check; title = para "#{project.title}", :stroke => color(project)
         c.click(){ update_status(project, self) }
         status_bar(project)
- 
       end
     end
   end
+  
 #==================client Methods====================#
 
   def refresh_clients 
@@ -198,7 +198,7 @@ Shoes.app :title => 'Colleague', :width => 1000 do
   sort_box.choose(item:'Sort By:')
   sort_box.change() do
     if "Due Today" == sort_box.text
-      view(:is_urgent?)
+      view(:due_today?)
       view.show()
     elsif "Due This Week" == sort_box.text
       view(:is_due_this_week?)
@@ -227,10 +227,6 @@ def open_task_window(project)
 #================= begin chart view method ========================#
 def open_chart_window(project)
   @window = window :title => project.title, :width => 1250 do
-    
-
-   
-
     dependent_tasks = project.checklist.projects.select{ |task| task.dependent_task }
     dependent_tasks.sort_by!{ |task| task.start_time }
       final_one = dependent_tasks.last.dependent_task

@@ -44,7 +44,7 @@ module Project_file
   end 
 
   def delete(id)
-    if self.class == Project
+    if self.class == Colleague
       projects = read
       file = "lib/projects.csv"
     else

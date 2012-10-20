@@ -60,6 +60,11 @@ class Project
     @id = project_number
   end
 
+  def due_today?
+    @deadline.strftime("%m %d %y") == Time.now.strftime("%m %d %y")
+  end
+
+
   def title= new_title
     !id ? @title = new_title : @title = update(@id, :title, new_title)
   end
