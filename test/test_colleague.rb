@@ -10,7 +10,6 @@ require 'checklist'
 require 'task'
 
 class ColleagueTest < Test::Unit::TestCase
-  include Project_file
 #==============project object attributes================#
 
   def test_01_project_exists
