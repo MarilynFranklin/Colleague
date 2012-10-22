@@ -47,11 +47,7 @@ class Checklist < Colleague
 
   def have_time_estimate?(array) 
     temp = array.select{ |task| task.time_estimate }
-    if temp.size == array.size && array.last.dependent_task.time_estimate
-      true 
-    else
-      false
-    end
+    temp.size == array.size && array.last.dependent_task.time_estimate ? true : false
   end
 
 end

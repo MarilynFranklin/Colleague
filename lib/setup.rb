@@ -12,7 +12,7 @@ class Setup
   include Client_file
   include Project_file
 
-  attr_reader :colleague, :client_manager, :tasks
+  attr_reader :colleague, :client_manager
 
   def initialize colleague, client_manager
     @colleague = colleague
@@ -21,7 +21,6 @@ class Setup
   end
 
   def client_history
-    client_array = []
     clients = read_clients
     clients.each do |hash|
       client = Client.new
@@ -31,13 +30,10 @@ class Setup
       client.email = hash[:email]
       client.phone = hash[:phone]
       @client_manager.add_past_client(client)
-      client_array << client
     end
-    client_array
   end
 
   def project_history
-    project_array = []
     string = ""
     projects = read 
     projects.each do |hash|
@@ -51,9 +47,7 @@ class Setup
       project.start_time = Time.at(hash[:start].to_i)
       project.client = @client_manager.client(hash[:client].to_i)
       @colleague.add_past_project(project)
-      project_array << project
     end
-    project_array
   end
 
   def task_history
@@ -77,7 +71,6 @@ class Setup
           # task temporarily saves the id of it's dependent task this will be reset to hold the actual object 
           # in dependent_task_history
           task.dependent_task = hash[:dependent_task].to_i == 0 ? nil : hash[:dependent_task].to_i
-          @tasks << task
         end
       end
     end

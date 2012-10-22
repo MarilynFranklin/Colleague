@@ -163,12 +163,7 @@ class ColleagueTest < Test::Unit::TestCase
     project.deadline= Time.now + (2 * DAY)
     assert_equal true, project.is_due_soon?
   end
-  def test_20_is_due_later_returns_true_when_greater_than_3_days_away
-    project = Project.new
-    project.deadline= Time.now + (3.5 * DAY)
-    assert_equal true, project.is_due_later?
-  end
-  def test_20b_due_this_week
+  def test_20_due_this_week
     project = Project.new
     project.deadline= Time.now + (7 * DAY)
     assert_equal true, project.is_due_this_week?

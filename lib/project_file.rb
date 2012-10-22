@@ -13,9 +13,7 @@ module Project_file
 
   def line_index(id, projects)
     match = nil
-    projects.each do |hash|
-      match = projects.index(hash) if hash[:id].to_i == id 
-    end
+    projects.each { |hash| match = projects.index(hash) if hash[:id].to_i == id }
     match
   end
 
@@ -39,19 +37,11 @@ module Project_file
   end 
 
   def file_name 
-    if self.class == Colleague || self.class == Project
-      file = "lib/projects.csv"
-    else
-      file = "lib/tasks.csv"
-    end
+    self.class == Colleague || self.class == Project ? file = "lib/projects.csv" : file = "lib/tasks.csv"
   end
 
   def file_contents
-    if self.class == Colleague || self.class == Project
-      read
-    else
-      read_tasks
-    end
+    self.class == Colleague || self.class == Project ? read : read_tasks
   end
 
   def delete(id)
