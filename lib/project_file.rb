@@ -20,13 +20,8 @@ module Project_file
   end
 
   def update(id, key, value)
-    if self.class == Project
-      projects = read
-      file = "lib/projects.csv"
-    else
-      projects = read_tasks
-      file = "lib/tasks.csv"
-    end
+    projects = file_contents
+    file = file_name
     project_index = line_index(id, projects)
     if key == :client || key == :dependent_task
       value.nil? ? projects[project_index][key] = nil : projects[project_index][key] = value.id
@@ -43,14 +38,25 @@ module Project_file
     value
   end 
 
-  def delete(id)
-    if self.class == Colleague
-      projects = read
+  def file_name 
+    if self.class == Colleague || self.class == Project
       file = "lib/projects.csv"
     else
-      projects = read_tasks
       file = "lib/tasks.csv"
     end
+  end
+
+  def file_contents
+    if self.class == Colleague || self.class == Project
+      read
+    else
+      read_tasks
+    end
+  end
+
+  def delete(id)
+    file = file_name
+    projects = file_contents
     project_index = line_index(id, projects)
     lines = File.readlines(file)
     lines.delete_at(project_index)
