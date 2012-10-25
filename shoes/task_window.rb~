@@ -1,0 +1,77 @@
+require 'lib/chart'
+
+module Shoes::Types
+  def open_task_window(project) 
+  window :title => "Tasks for #{project.title}" do
+    @project = project
+
+    def color(project)
+      return green if project.status == :complete
+      return if !project.deadline
+      if project.is_due_soon?
+        orange
+      elsif project.is_urgent?
+        red
+      else
+        black
+      end
+    end
+
+    def list(task)
+      edit = flow do
+        button "view" do
+          edit.open_task_edit_window(task, self, :refresh, @project)
+        end
+        button "remove" do
+          @project.checklist.remove_task(task)
+          refresh
+        end
+        c = check; title = para "#{task.title}", :stroke => color(task)
+        c.click() do
+          task.status == :complete ? task.status = :incomplete : task.status = :complete 
+          refresh
+        end
+      end
+    end
+    def refresh
+      @task_list.clear do 
+        @project.checklist.projects.each do |task|
+          list(task)
+        end
+      end
+    end
+    task_add = flow do
+      @title = edit_line
+      button "Add Task" do
+        task = Task.new
+        task.title = @title.text
+        if !project.checklist
+          checklist = Checklist.new
+          project.checklist = checklist
+        end
+        task.project = project
+        project.checklist.add_task(task)
+        @task_list.append do 
+          list(task)
+        end
+        @title.text = ""
+      end
+
+      if project.checklist
+        dependent_tasks = project.checklist.projects.select{ |task| task.dependent_task  if project.checklist }
+        dependent_tasks.sort_by!{ |task| task.start_time }
+        if dependent_tasks.size != 0 && project.checklist.have_time_estimate?(dependent_tasks)
+          final_one = dependent_tasks.last.dependent_task
+          button "View Chart" do
+            @task_list.open_chart_window(project)
+          end
+        end
+      end
+    end
+    @task_list = stack
+    @task_list.append do
+      refresh if project.checklist
+    end
+    end
+  end
+end

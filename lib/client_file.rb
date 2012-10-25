@@ -1,7 +1,7 @@
 module Client_file
 
   def read_clients
-    file = File.open('lib/clients.csv', 'r')
+    file = File.open('files/clients.csv', 'r')
     clients = []
     while (line = file.gets)
       columns = line.split(",")
@@ -15,9 +15,9 @@ module Client_file
     clients = read_clients
     client_index = id - 1
     clients[client_index][key] = value
-    lines = File.readlines('lib/clients.csv')
+    lines = File.readlines('files/clients.csv')
     lines[project_index] = clients[client_index].values.join(",")
-    File.open('lib/clients.csv', 'w') do |csv|
+    File.open('files/clients.csv', 'w') do |csv|
       lines.each{ |line| csv.puts(line) }
     end
     value

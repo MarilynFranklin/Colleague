@@ -9,7 +9,7 @@ class Checklist < Colleague
     @num_projects += 1
     task.id = @@total_num_tasks
     @projects << task
-    CSV.open('lib/tasks.csv', 'ab') do |csv|
+    CSV.open('files/tasks.csv', 'ab') do |csv|
       csv << [task.id, task.title, task.deadline.to_i, task.type, task.start_time.to_i, task.notes, task.status, task.project ? task.project.id : nil, task.time_estimate.to_i, task.dependent_task ? task.dependent_task.id : nil ]
     end
   end
@@ -24,7 +24,7 @@ class Checklist < Colleague
     @active_projects -= 1
     @projects.delete(task)
     delete(task.id)
-    CSV.open('lib/tasks_archive.csv', 'ab') do |csv|
+    CSV.open('files/tasks_archive.csv', 'ab') do |csv|
       csv << [task.id, task.title, task.deadline.to_i, task.type, task.start_time.to_i, task.notes, task.status, task.project ? task.project.id : nil, task.time_estimate.to_i, task.dependent_task ? task.dependent_task.id : nil ]
     end
   end

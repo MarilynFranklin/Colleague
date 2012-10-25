@@ -1,7 +1,7 @@
 module Project_file
 
   def read
-    file = File.open('lib/projects.csv', 'r')
+    file = File.open('files/projects.csv', 'r')
     projects = []
     while (line = file.gets)
       columns = line.split(",")
@@ -37,7 +37,7 @@ module Project_file
   end 
 
   def file_name 
-    self.class == Colleague || self.class == Project ? file = "lib/projects.csv" : file = "lib/tasks.csv"
+    self.class == Colleague || self.class == Project ? file = "files/projects.csv" : file = "files/tasks.csv"
   end
 
   def file_contents
@@ -56,7 +56,7 @@ module Project_file
   end
 
   def read_archive
-    file = File.open('lib/projects_archive.csv', 'r')
+    file = File.open('files/projects_archive.csv', 'r')
     projects = []
     while (line = file.gets)
       columns = line.split(",")
@@ -67,7 +67,7 @@ module Project_file
   end
 
   def read_tasks
-    file = File.open('lib/tasks.csv', 'r')
+    file = File.open('files/tasks.csv', 'r')
     projects = []
     while (line = file.gets)
       columns = line.split(",")

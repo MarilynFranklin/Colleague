@@ -10,6 +10,7 @@ require 'checklist'
 require 'task'
 
 class ColleagueTest < Test::Unit::TestCase
+  include Project_file
 #==============project object attributes================#
 
   def test_01_project_exists
@@ -85,14 +86,14 @@ class ColleagueTest < Test::Unit::TestCase
     cm.add_client(client2)
     cm.add_client(client3)
     assert_equal 3, cm.num_clients
-    File.open('lib/clients.csv', 'w') { |file| file.truncate(0) }
+    File.open('files/clients.csv', 'w') { |file| file.truncate(0) }
   end
   def test_12c_client_has_id
     cm = Client_manager.new
     client = Client.new
     cm.add_client(client)
     assert_equal 1, client.id
-    File.open('lib/clients.csv', 'w') { |file| file.truncate(0) }
+    File.open('files/clients.csv', 'w') { |file| file.truncate(0) }
   end
   def test_12e_client_has_id
     cm = Client_manager.new
@@ -101,7 +102,7 @@ class ColleagueTest < Test::Unit::TestCase
     cm.add_client(client)
     cm.add_client(client2)
     assert_equal 2, client2.id
-    File.open('lib/clients.csv', 'w') { |file| file.truncate(0) }
+    File.open('files/clients.csv', 'w') { |file| file.truncate(0) }
   end
   def test_13_project_can_set_client
     client = Client.new
@@ -112,7 +113,7 @@ class ColleagueTest < Test::Unit::TestCase
     project = Project.new
     project.client= client
     assert_equal 1, project.client.id
-    File.open('lib/clients.csv', 'w') { |file| file.truncate(0) }
+    File.open('files/clients.csv', 'w') { |file| file.truncate(0) }
   end
   def test_14_project_can_set_client
     client = Client.new
@@ -123,7 +124,7 @@ class ColleagueTest < Test::Unit::TestCase
     project = Project.new
     project.client= client2
     assert_equal 2, project.client.id
-    File.open('lib/clients.csv', 'w') { |file| file.truncate(0) }
+    File.open('files/clients.csv', 'w') { |file| file.truncate(0) }
   end
   def test_14b_can_find_client_by_id
     client = Client.new
@@ -134,7 +135,7 @@ class ColleagueTest < Test::Unit::TestCase
     project = Project.new
     project.client= client2
     assert_equal client2, cm.client(2)
-    File.open('lib/clients.csv', 'w') { |file| file.truncate(0) }
+    File.open('files/clients.csv', 'w') { |file| file.truncate(0) }
   end
 #==============project object operations================#
   def test_15_can_set_project_as_complete
@@ -196,7 +197,7 @@ class ColleagueTest < Test::Unit::TestCase
     proj_manager.add_project(project)
     proj_manager.add_project(project2)
     assert_equal 2, proj_manager.num_projects
-    File.open('lib/projects.csv', 'w') {|file| file.truncate(0) }
+    File.open('files/projects.csv', 'w') {|file| file.truncate(0) }
   end
   
   def test_26_lines_index_is_correct
@@ -209,14 +210,14 @@ class ColleagueTest < Test::Unit::TestCase
     proj_manager.add_project(project3)
     projects = read
     assert_equal 1, line_index(project2.id, projects)
-    File.open('lib/projects.csv', 'w') { |file| file.truncate(0) }
+    File.open('files/projects.csv', 'w') { |file| file.truncate(0) }
   end
   def test_27_colleague_sets_project_id_to_match_num_projects
     proj_manager = Colleague.new
     project = Project.new
     proj_manager.add_project(project)
     assert_equal 1, project.id
-    File.open('lib/projects.csv', 'w') { |file| file.truncate(0) }
+    File.open('files/projects.csv', 'w') { |file| file.truncate(0) }
   end 
   def test_28_colleague_sets_project_id_to_match_num_projects
     proj_manager = Colleague.new
@@ -225,7 +226,7 @@ class ColleagueTest < Test::Unit::TestCase
     proj_manager.add_project(project)
     proj_manager.add_project(project2)
     assert_equal 2, project2.id
-    File.open('lib/projects.csv', 'w') { |file| file.truncate(0) }
+    File.open('files/projects.csv', 'w') { |file| file.truncate(0) }
   end 
   def test_29_colleague_keeps_track_of_active_projects
     proj_manager = Colleague.new
@@ -234,7 +235,7 @@ class ColleagueTest < Test::Unit::TestCase
     proj_manager.add_project(project)
     proj_manager.add_project(project2)
     assert_equal 2, proj_manager.active_projects
-    File.open('lib/projects.csv', 'w') { |file| file.truncate(0) }
+    File.open('files/projects.csv', 'w') { |file| file.truncate(0) }
   end
 
   def test_30_Module_changes_start_time_after_project_added_to_file
@@ -247,7 +248,7 @@ class ColleagueTest < Test::Unit::TestCase
     project2.start_time = Time.local(2012, 10, 9, 22, 53,57)
 
     assert_equal project2.start_time.to_s, "2012-10-09 22:53:57 -0500"
-    File.open('lib/projects.csv', 'w') { |file| file.truncate(0) }
+    File.open('files/projects.csv', 'w') { |file| file.truncate(0) }
   end
 
   def test_31_can_change_project_title_after_added_to_colleague
@@ -256,7 +257,7 @@ class ColleagueTest < Test::Unit::TestCase
     proj_manager.add_project(project)
     project.title = "new title"
     assert_equal "new title", project.title
-    File.open('lib/projects.csv', 'w') { |file| file.truncate(0) }
+    File.open('files/projects.csv', 'w') { |file| file.truncate(0) }
   end
 
   def test_32_can_change_project_status_after_added_to_colleague
@@ -265,7 +266,7 @@ class ColleagueTest < Test::Unit::TestCase
     proj_manager.add_project(project)
     project.status = :complete
     assert_equal :complete, project.status
-    File.open('lib/projects.csv', 'w') { |file| file.truncate(0) }
+    File.open('files/projects.csv', 'w') { |file| file.truncate(0) }
   end
 
   def test_33_can_change_project_type_after_added_to_colleague
@@ -274,7 +275,7 @@ class ColleagueTest < Test::Unit::TestCase
     proj_manager.add_project(project)
     project.type = "web development"
     assert_equal "web development", project.type
-    File.open('lib/projects.csv', 'w') { |file| file.truncate(0) }
+    File.open('files/projects.csv', 'w') { |file| file.truncate(0) }
   end
 
   def test_34_can_change_project_notes_after_added_to_colleague
@@ -283,7 +284,7 @@ class ColleagueTest < Test::Unit::TestCase
     proj_manager.add_project(project)
     project.notes = "important"
     assert_equal "important", project.notes
-    File.open('lib/projects.csv', 'w') { |file| file.truncate(0) }
+    File.open('files/projects.csv', 'w') { |file| file.truncate(0) }
   end
 
   def test_35_can_change_project_client_after_added_to_colleague
@@ -294,7 +295,7 @@ class ColleagueTest < Test::Unit::TestCase
     client2.first_name = "Glen"
     project.client = client2
     assert_equal "Glen", project.client.first_name
-    File.open('lib/projects.csv', 'w') { |file| file.truncate(0) }
+    File.open('files/projects.csv', 'w') { |file| file.truncate(0) }
   end
 
   def test_36_can_change_project_client_name_after_added_to_colleague
@@ -306,7 +307,7 @@ class ColleagueTest < Test::Unit::TestCase
     project.client = client2
     client2.first_name = "Sam"
     assert_equal "Sam", project.client.first_name
-    File.open('lib/projects.csv', 'w') { |file| file.truncate(0) }
+    File.open('files/projects.csv', 'w') { |file| file.truncate(0) }
   end  
 
   def test_37_projects_can_have_checklists
@@ -324,7 +325,7 @@ class ColleagueTest < Test::Unit::TestCase
     checklist.add_task(task2)
     project.checklist = checklist
     assert_equal 2, project.checklist.num_projects
-    File.open('lib/tasks.csv', 'w') { |file| file.truncate(0) }
+    File.open('files/tasks.csv', 'w') { |file| file.truncate(0) }
   end
   def test_39_Colleague_stores_checklist_with_project
     c = Colleague.new
@@ -337,7 +338,7 @@ class ColleagueTest < Test::Unit::TestCase
     project.checklist = checklist
     c.add_project(project)
     assert_equal checklist, project.checklist
-    File.open('lib/tasks.csv', 'w') { |file| file.truncate(0) }
+    File.open('files/tasks.csv', 'w') { |file| file.truncate(0) }
   end
   def test_40_tasks_know_what_project_they_belong_to
     project = Project.new
@@ -346,7 +347,7 @@ class ColleagueTest < Test::Unit::TestCase
     checklist.add_task(task)
     task.project = project
     assert_equal project, task.project
-    File.open('lib/tasks.csv', 'w') { |file| file.truncate(0) }
+    File.open('files/tasks.csv', 'w') { |file| file.truncate(0) }
   end
   def test_41_task_projects_are_set_when_checklist_is_added_to_project
     project = Project.new
@@ -355,7 +356,7 @@ class ColleagueTest < Test::Unit::TestCase
     checklist.add_task(task)
     project.checklist = checklist
     assert_equal project, task.project
-    File.open('lib/tasks.csv', 'w') { |file| file.truncate(0) }
+    File.open('files/tasks.csv', 'w') { |file| file.truncate(0) }
   end
 
   def test_42_tasks_can_be_marked_as_complete
@@ -366,7 +367,7 @@ class ColleagueTest < Test::Unit::TestCase
     project.checklist = checklist
     task.status = :complete
     assert_equal :complete, task.status
-    File.open('lib/tasks.csv', 'w') { |file| file.truncate(0) }
+    File.open('files/tasks.csv', 'w') { |file| file.truncate(0) }
   end
   def test_43_num_complete_returns_number_of_complete_tasks
     checklist = Checklist.new
@@ -378,7 +379,7 @@ class ColleagueTest < Test::Unit::TestCase
     checklist.add_task(task3)
     task.status = :complete
     assert_equal 1, checklist.num_complete
-    File.open('lib/tasks.csv', 'w') { |file| file.truncate(0) }
+    File.open('files/tasks.csv', 'w') { |file| file.truncate(0) }
   end
   def test_44_percent_complete_returns_percent_of_completed_tasks
     checklist = Checklist.new
@@ -392,7 +393,7 @@ class ColleagueTest < Test::Unit::TestCase
     checklist.add_task(task4)
     task.status = :complete
     assert_equal 0.25, checklist.percent_complete
-    File.open('lib/tasks.csv', 'w') { |file| file.truncate(0) }
+    File.open('files/tasks.csv', 'w') { |file| file.truncate(0) }
   end
   def test_45_remove_task_removes_task_from_projects_array
     checklist = Checklist.new
@@ -404,8 +405,8 @@ class ColleagueTest < Test::Unit::TestCase
     checklist.add_task(task3)
     checklist.remove_task(task3)
     assert_equal false, checklist.projects.include?(task3)
-    File.open('lib/tasks.csv', 'w') { |file| file.truncate(0) }
-    File.open('lib/tasks_archive.csv', 'w') { |file| file.truncate(0) }
+    File.open('files/tasks.csv', 'w') { |file| file.truncate(0) }
+    File.open('files/tasks_archive.csv', 'w') { |file| file.truncate(0) }
   end
   def test_46_task_have_time_estimate
     task = Task.new
@@ -413,7 +414,7 @@ class ColleagueTest < Test::Unit::TestCase
     task.start_time =  time
     task.time_estimate= 3
     assert_equal 3, task.time_estimate
-    File.open('lib/tasks.csv', 'w') { |file| file.truncate(0) }
+    File.open('files/tasks.csv', 'w') { |file| file.truncate(0) }
   end
   def test_47_time_estimate_calculates_deadline
     task = Task.new
@@ -421,7 +422,7 @@ class ColleagueTest < Test::Unit::TestCase
     task.start_time =  time
     task.time_estimate= 3
     assert_equal time + (3 * DAY), task.deadline
-    File.open('lib/tasks.csv', 'w') { |file| file.truncate(0) }
+    File.open('files/tasks.csv', 'w') { |file| file.truncate(0) }
   end
   def test_48_time_estimate_recalculate_deadline_if_start_time_is_changed
     task = Task.new
@@ -429,14 +430,14 @@ class ColleagueTest < Test::Unit::TestCase
     task.time_estimate= 3
     task.start_time =  time
     assert_equal time + (3 * DAY), task.deadline
-    File.open('lib/tasks.csv', 'w') { |file| file.truncate(0) }
+    File.open('files/tasks.csv', 'w') { |file| file.truncate(0) }
   end
   def test_49_task_can_have_dependent_tasks
     task = Task.new
     task2 = Task.new
     task.dependent_task = task2
     assert_equal task2 , task.dependent_task
-    File.open('lib/tasks.csv', 'w') { |file| file.truncate(0) }
+    File.open('files/tasks.csv', 'w') { |file| file.truncate(0) }
   end
   def test_50_dependent_tasks_start_on_deadline_of_parent_task
     task = Task.new
@@ -446,7 +447,7 @@ class ColleagueTest < Test::Unit::TestCase
     task2 = Task.new
     task.dependent_task = task2
     assert_equal time + (3 * DAY) , task2.start_time
-    File.open('lib/tasks.csv', 'w') { |file| file.truncate(0) }
+    File.open('files/tasks.csv', 'w') { |file| file.truncate(0) }
   end
   def test_51_dependent_tasks_start_on_deadline_of_parent_task
     task = Task.new
@@ -459,7 +460,7 @@ class ColleagueTest < Test::Unit::TestCase
     checklist.add_task(task2)
     task.dependent_task = task2
     assert_equal time + (3 * DAY) , task2.start_time
-    File.open('lib/tasks.csv', 'w') { |file| file.truncate(0) }
+    File.open('files/tasks.csv', 'w') { |file| file.truncate(0) }
   end
   def test_52_dependent_tasks_can_be_set_to_nil
     task = Task.new
@@ -475,7 +476,7 @@ class ColleagueTest < Test::Unit::TestCase
     task.dependent_task = task2
     task.dependent_task = nil
     assert_equal nil , task.dependent_task
-    File.open('lib/tasks.csv', 'w') { |file| file.truncate(0) }
+    File.open('files/tasks.csv', 'w') { |file| file.truncate(0) }
   end
   def test_53_dependent_tasks_can_be_set_to_nil
     task = Task.new
@@ -493,25 +494,7 @@ class ColleagueTest < Test::Unit::TestCase
     task.dependent_task = task2
     task2.dependent_task = task3
     assert_equal 9, checklist.dependent_time_span
-    File.open('lib/tasks.csv', 'w') { |file| file.truncate(0) }
+    File.open('files/tasks.csv', 'w') { |file| file.truncate(0) }
   end
 
 end
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -17,8 +17,6 @@ Feature List
 
   Has a week view, allowing you to view all projects due that week
 
-  Has a quick view, allowing you to see the number of due projects
-
   Allows you to list the type of project, name of client, due date, and project status
 
 
@@ -31,6 +29,8 @@ Possible Features
   Checklists within projects
 
   Status bar that indicates progress towards completion
+
+  Gantt Charts
 
 
 Dependencies

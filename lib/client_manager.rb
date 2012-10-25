@@ -12,7 +12,7 @@ class Client_manager
     @num_clients += 1
     client.id = @num_clients
     @clients << client
-    CSV.open('lib/clients.csv', 'ab') do |csv|
+    CSV.open('files/clients.csv', 'ab') do |csv|
       csv << [@num_clients, client.first_name, client.last_name, client.email, client.phone]
     end
   end
